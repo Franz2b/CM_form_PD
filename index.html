@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Formulaire Process – Diagnostic terrain</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="container">
+        <h1>Diagnostic Process – Formulaire</h1>
+        <p class="subtitle">Formulaire standardisé pour qualifier et prioriser les cas d'usage</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <form id="process-form" novalidate>
+        <nav class="wizard" aria-label="Navigation par chapitres">
+          <ol class="wizard-steps" role="tablist">
+            <li><button type="button" class="wizard-step" data-step="1" role="tab" aria-controls="bloc-1" aria-selected="true">📝 1. Processus</button></li>
+            <li><button type="button" class="wizard-step" data-step="2" role="tab" aria-controls="bloc-2" aria-selected="false">📊 2. Volumétrie</button></li>
+            <li><button type="button" class="wizard-step" data-step="3" role="tab" aria-controls="bloc-3" aria-selected="false">💥 3. Impact</button></li>
+            <li><button type="button" class="wizard-step" data-step="4" role="tab" aria-controls="bloc-4" aria-selected="false">👤 4. Contact</button></li>
+            <li><button type="button" class="wizard-step" data-step="5" role="tab" aria-controls="bloc-5" aria-selected="false">🧮 5. Scoring</button></li>
+          </ol>
+          <div class="progress"><div id="progress-fill" class="progress-fill" style="width: 20%"></div></div>
+        </nav>
+
+        <section class="step-section is-active" data-step="1" aria-labelledby="bloc-1">
+          <h2 id="bloc-1">1. Comprendre le processus</h2>
+
+          <div class="form-group">
+            <label for="q1">Q1. Nom du processus <span class="required">(requis)</span></label>
+            <p class="hint" id="q1-hint">Pourquoi ? → Identifier clairement le sujet.</p>
+            <input type="text" id="q1" name="q1" aria-describedby="q1-hint" required />
+          </div>
+
+          <div class="form-group">
+            <label for="q2">Q2. Objectif du processus</label>
+            <p class="hint" id="q2-hint">Pourquoi ? → Comprendre la finalité métier.</p>
+            <textarea id="q2" name="q2" aria-describedby="q2-hint" rows="4"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="q3">Q3. 3 à 4 étapes clés</label>
+            <p class="hint" id="q3-hint">Pourquoi ? → Visualiser le déroulé opérationnel.</p>
+            <textarea id="q3" name="q3" aria-describedby="q3-hint" rows="4" placeholder="Étape 1 → Étape 2 → Étape 3 → Étape 4"></textarea>
+          </div>
+
+          <fieldset class="form-group">
+            <legend>Q4. Enjeux associés</legend>
+            <p class="hint" id="q4-hint">Pourquoi ? → Cibler les grands leviers métier.</p>
+            <div class="options" role="group" aria-describedby="q4-hint">
+              <label><input type="checkbox" name="q4" value="Productivité / efficacité" /> Productivité / efficacité</label>
+              <label><input type="checkbox" name="q4" value="Qualité / fiabilité" /> Qualité / fiabilité</label>
+              <label><input type="checkbox" name="q4" value="Coût" /> Coût</label>
+              <label><input type="checkbox" name="q4" value="QVT / charge mentale" /> QVT / charge mentale</label>
+              <label><input type="checkbox" name="q4" value="Conformité / réglementation" /> Conformité / réglementation</label>
+              <label><input type="checkbox" name="q4" value="Expérience client" /> Expérience client</label>
+              <label><input type="checkbox" name="q4" value="Réduction des risques" /> Réduction des risques</label>
+              <label class="with-inline">
+                <input type="checkbox" name="q4" value="Autre" data-controls="q4-autre" /> Autre (à préciser)
+                <input type="text" id="q4-autre" name="q4_autre" class="inline-input" placeholder="Précisez" aria-label="Autre enjeu" />
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="form-group">
+            <label for="q5">Q5. Outils utilisés</label>
+            <p class="hint" id="q5-hint">Pourquoi ? → Identifier les outils à interfacer ou automatiser.</p>
+            <input type="text" id="q5" name="q5" aria-describedby="q5-hint" placeholder="Ex. Excel, ERP, CRM, e-mails..." />
+          </div>
+
+          <div class="form-group">
+            <label for="q6">Q6. Parties prenantes internes / externes</label>
+            <p class="hint" id="q6-hint">Pourquoi ? → Comprendre qui est concerné par le process.</p>
+            <input type="text" id="q6" name="q6" aria-describedby="q6-hint" placeholder="Ex. Achats, Logistique, Finance, Clients, Fournisseurs..." />
+          </div>
+        </section>
+
+        <section class="step-section" data-step="2" aria-labelledby="bloc-2">
+          <h2 id="bloc-2">2. Mesurer la volumétrie et les irritants</h2>
+
+          <fieldset class="form-group">
+            <legend>Q7. Fréquence d’exécution</legend>
+            <p class="hint" id="q7-hint">Pourquoi ? → Mesurer l’importance opérationnelle.</p>
+            <div class="options" role="radiogroup" aria-describedby="q7-hint">
+              <label><input type="radio" name="q7" value="Quotidienne" /> Quotidienne</label>
+              <label><input type="radio" name="q7" value="Hebdomadaire" /> Hebdomadaire</label>
+              <label><input type="radio" name="q7" value="Mensuelle" /> Mensuelle</label>
+              <label><input type="radio" name="q7" value="Trimestrielle" /> Trimestrielle</label>
+              <label><input type="radio" name="q7" value="Occasionnelle / ad hoc" /> Occasionnelle / ad hoc</label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Q8. Nombre d’exécutions typiques</legend>
+            <p class="hint" id="q8-hint">Pourquoi ? → Quantifier la volumétrie.</p>
+            <div class="options" role="radiogroup" aria-describedby="q8-hint">
+              <label><input type="radio" name="q8" value="1–10" /> 1–10</label>
+              <label><input type="radio" name="q8" value="11–50" /> 11–50</label>
+              <label><input type="radio" name="q8" value="51–200" /> 51–200</label>
+              <label><input type="radio" name="q8" value="201–1000" /> 201–1000</label>
+              <label><input type="radio" name="q8" value="1000+" /> 1000+</label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Q9. Durée moyenne par exécution</legend>
+            <p class="hint" id="q9-hint">Pourquoi ? → Estimer le temps mobilisé.</p>
+            <div class="options" role="radiogroup" aria-describedby="q9-hint">
+              <label><input type="radio" name="q9" value="< 10 min" /> &lt; 10 min</label>
+              <label><input type="radio" name="q9" value="10–30 min" /> 10–30 min</label>
+              <label><input type="radio" name="q9" value="30–60 min" /> 30–60 min</label>
+              <label><input type="radio" name="q9" value="1–2 h" /> 1–2 h</label>
+              <label><input type="radio" name="q9" value="+2 h" /> +2 h</label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Q10. Nombre de personnes impliquées</legend>
+            <p class="hint" id="q10-hint">Pourquoi ? → Mesurer l’empreinte organisationnelle.</p>
+            <div class="options" role="radiogroup" aria-describedby="q10-hint">
+              <label><input type="radio" name="q10" value="1" /> 1</label>
+              <label><input type="radio" name="q10" value="2–5" /> 2–5</label>
+              <label><input type="radio" name="q10" value="6–20" /> 6–20</label>
+              <label><input type="radio" name="q10" value="21–50" /> 21–50</label>
+              <label><input type="radio" name="q10" value="50+" /> 50+</label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Q11. Nombre de GO concernés</legend>
+            <p class="hint" id="q11-hint">Pourquoi ? → Calibrer l’impact global.</p>
+            <div class="options" role="radiogroup" aria-describedby="q11-hint">
+              <label><input type="radio" name="q11" value="1–10" /> 1–10</label>
+              <label><input type="radio" name="q11" value="11–50" /> 11–50</label>
+              <label><input type="radio" name="q11" value="51–200" /> 51–200</label>
+              <label><input type="radio" name="q11" value="201–1000" /> 201–1000</label>
+              <label><input type="radio" name="q11" value="1000+" /> 1000+</label>
+            </div>
+          </fieldset>
+
+          <div class="form-group">
+            <label for="q12">Q12. Niveau d’irritant perçu (1–5)</label>
+            <p class="hint" id="q12-hint">Pourquoi ? → Identifier les cas les plus douloureux terrain. 1 = très faible / 5 = très fort</p>
+            <div class="range-row">
+              <span>1</span>
+              <input type="range" id="q12" name="q12" min="1" max="5" step="1" value="3" aria-describedby="q12-hint" />
+              <span>5</span>
+              <output id="q12-output" for="q12">3</output>
+            </div>
+          </div>
+
+          <fieldset class="form-group">
+            <legend>Q13. Caractéristiques du process</legend>
+            <p class="hint" id="q13-hint">Pourquoi ? → Identifier les bons candidats à l’automatisation.</p>
+            <div class="options" role="group" aria-describedby="q13-hint">
+              <label><input type="checkbox" name="q13" value="Répétitif" /> Répétitif</label>
+              <label><input type="checkbox" name="q13" value="Chronophage" /> Chronophage</label>
+              <label><input type="checkbox" name="q13" value="Faible valeur ajoutée" /> Faible valeur ajoutée</label>
+              <label><input type="checkbox" name="q13" value="Sujet à erreurs humaines / informatiques" /> Sujet à erreurs humaines / informatiques</label>
+              <label><input type="checkbox" name="q13" value="Basé sur des règles claires" /> Basé sur des règles claires</label>
+              <label><input type="checkbox" name="q13" value="Données structurées" /> Données structurées</label>
+              <label><input type="checkbox" name="q13" value="Saisie manuelle" /> Saisie manuelle</label>
+              <label><input type="checkbox" name="q13" value="Sensible aux délais" /> Sensible aux délais</label>
+              <label><input type="checkbox" name="q13" value="Multi-outils" /> Multi-outils</label>
+              <label><input type="checkbox" name="q13" value="Fort besoin de coordination inter-équipes" /> Fort besoin de coordination inter-équipes</label>
+            </div>
+          </fieldset>
+        </section>
+
+        <section class="step-section" data-step="3" aria-labelledby="bloc-3">
+          <h2 id="bloc-3">3. Impact & gains potentiels</h2>
+
+          <fieldset class="form-group">
+            <legend>Q14. Type d’impact attendu</legend>
+            <p class="hint" id="q14-hint">Pourquoi ? → Clarifier les bénéfices principaux.</p>
+            <div class="options" role="group" aria-describedby="q14-hint">
+              <label><input type="checkbox" name="q14" value="Gain de temps" /> Gain de temps</label>
+              <label><input type="checkbox" name="q14" value="Amélioration de la qualité" /> Amélioration de la qualité</label>
+              <label><input type="checkbox" name="q14" value="Meilleure fiabilité" /> Meilleure fiabilité</label>
+              <label><input type="checkbox" name="q14" value="Réduction des coûts" /> Réduction des coûts</label>
+              <label><input type="checkbox" name="q14" value="Meilleure satisfaction GO" /> Meilleure satisfaction GO</label>
+              <label><input type="checkbox" name="q14" value="Meilleure satisfaction client" /> Meilleure satisfaction client</label>
+              <label><input type="checkbox" name="q14" value="Amélioration conformité / réduction des risques" /> Amélioration conformité / réduction des risques</label>
+              <label><input type="checkbox" name="q14" value="Meilleure collaboration interne" /> Meilleure collaboration interne</label>
+              <label class="with-inline">
+                <input type="checkbox" name="q14" value="Autre" data-controls="q14-autre" /> Autre (à préciser)
+                <input type="text" id="q14-autre" name="q14_autre" class="inline-input" placeholder="Précisez" aria-label="Autre impact" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Q15. Temps ou coût potentiellement économisé</legend>
+            <p class="hint" id="q15-hint">Pourquoi ? → Mesurer la valeur métier simplement.</p>
+            <div class="options" role="radiogroup" aria-describedby="q15-hint">
+              <label><input type="radio" name="q15" value="< 30 min par exécution" /> &lt; 30 min par exécution</label>
+              <label><input type="radio" name="q15" value="30 min – 2 h" /> 30 min – 2 h</label>
+              <label><input type="radio" name="q15" value="2 h – 1 jour" /> 2 h – 1 jour</label>
+              <label><input type="radio" name="q15" value="> 1 jour" /> &gt; 1 jour</label>
+              <label><input type="radio" name="q15" value="Difficile à estimer" /> Difficile à estimer</label>
+            </div>
+            <div class="form-group compact">
+              <label for="q15-cout">Si coût connu (€) — facultatif</label>
+              <input type="number" id="q15-cout" name="q15_cout" min="0" step="0.01" placeholder="Ex. 2500" />
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Q16. Impact direct / indirect</legend>
+            <p class="hint" id="q16-hint">Pourquoi ? → Préciser l’étendue de l’impact.</p>
+            <div class="options" role="group" aria-describedby="q16-hint">
+              <label><input type="checkbox" name="q16" value="Direct — exécutants / équipes métier" /> Direct — sur les exécutants / équipes métier</label>
+              <label><input type="checkbox" name="q16" value="Indirect — GO / support / clients internes" /> Indirect — sur les GO / support / clients internes</label>
+              <label><input type="checkbox" name="q16" value="Indirect — clients externes / GM" /> Indirect — sur les clients externes / GM</label>
+              <label><input type="checkbox" name="q16" value="Impact transverse (plusieurs équipes / BU)" /> Impact transverse (plusieurs équipes / BU)</label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Q17. Type de coûts concernés (si applicable)</legend>
+            <p class="hint" id="q17-hint">Pourquoi ? → Identifier des leviers économiques au-delà du temps.</p>
+            <div class="options" role="group" aria-describedby="q17-hint">
+              <label><input type="checkbox" name="q17" value="Coûts salariaux (temps de traitement)" /> Coûts salariaux (temps de traitement)</label>
+              <label><input type="checkbox" name="q17" value="Coûts opérationnels (ex. stock, commandes, matériel)" /> Coûts opérationnels (ex. stock, commandes, matériel)</label>
+              <label><input type="checkbox" name="q17" value="Coûts de non qualité (ex. erreurs, retours)" /> Coûts de non qualité (ex. erreurs, retours)</label>
+              <label><input type="checkbox" name="q17" value="Coûts de coordination (réunions, transferts)" /> Coûts de coordination (réunions, transferts)</label>
+              <label class="with-inline">
+                <input type="checkbox" name="q17" value="Autre" data-controls="q17-autre" /> Autre (à préciser)
+                <input type="text" id="q17-autre" name="q17_autre" class="inline-input" placeholder="Précisez" aria-label="Autre coût" />
+              </label>
+            </div>
+          </fieldset>
+        </section>
+
+        <section class="step-section" data-step="4" aria-labelledby="bloc-4">
+          <h2 id="bloc-4">4. Informations contact</h2>
+          <div class="two-col">
+            <div class="form-group">
+              <label for="q18">Q18. Nom et prénom <span class="required">(requis)</span></label>
+              <input type="text" id="q18" name="q18" required />
+            </div>
+            <div class="form-group">
+              <label for="q19">Q19. Poste / fonction <span class="required">(requis)</span></label>
+              <input type="text" id="q19" name="q19" required />
+            </div>
+            <div class="form-group">
+              <label for="q20">Q20. Département / entité</label>
+              <input type="text" id="q20" name="q20" />
+            </div>
+            <div class="form-group">
+              <label for="q21">Q21. E-mail <span class="required">(requis)</span></label>
+              <input type="email" id="q21" name="q21" inputmode="email" placeholder="prenom.nom@entreprise.com" required />
+            </div>
+          </div>
+        </section>
+
+        <section class="form-footer" aria-live="polite">
+          <p class="autosave">💾 Sauvegarde automatique activée — vous pouvez revenir plus tard.</p>
+          <p class="save-indicator" id="save-indicator">Dernière sauvegarde : jamais</p>
+          <div class="actions">
+            <button type="button" id="export-json" class="secondary">Exporter en JSON</button>
+            <button type="button" id="reset-form" class="ghost">Réinitialiser</button>
+            <a class="link" href="#" id="coach-link">📞 Besoin d’aide ? Contactez le Coach IA</a>
+          </div>
+        </section>
+
+        <section class="conformite meta-section" hidden>
+          <h3>Conformité au cahier des charges</h3>
+          <ul>
+            <li>🧭 Structure standardisée → 4 blocs clairs, identiques pour tous.</li>
+            <li>📊 Critères comparables → Échelles, fourchettes, cases à cocher normalisées.</li>
+            <li>🧮 Scoring possible → Temps, irritants, volumétrie, impact structurés.</li>
+            <li>👤 Accessible terrain → Formulation métier + « Pourquoi ».</li>
+            <li>⏳ Rapide à remplir → 21 questions max, majoritairement choix multiples.</li>
+            <li>🪫 Mesure des irritants → Q12 + Q13 dédiées.</li>
+            <li>🚀 Actionnable delivery → Parties prenantes + volumétrie + coûts + impact.</li>
+            <li>🧭 Décision rapide → Go / No Go priorisable dès réception.</li>
+          </ul>
+        </section>
+
+        <section class="retours meta-section" hidden>
+          <h3>Intégration des retours Edith</h3>
+          <ul>
+            <li>✅ Impact direct / indirect → Q16</li>
+            <li>✅ Inversion Q14/Q15 pour logique impact → gains</li>
+            <li>✅ Coûts directs / indirects → Q17</li>
+            <li>✅ Formulaire orienté diagnostic terrain → pas stratégique lourd</li>
+            <li>✅ Précision sur bénéfices et portée → Q14 enrichie</li>
+          </ul>
+        </section>
+
+        <section class="step-section" data-step="5" aria-labelledby="bloc-5">
+          <h2 id="bloc-5">🧮 Scoring & Synthèse</h2>
+          <p class="hint">Calculé en arrière‑plan à partir des réponses. Pondération: <strong>Gains 40%</strong>, <strong>Irritants & urgence 30%</strong>, <strong>Faisabilité 30%</strong>.</p>
+
+          <article class="panel recap">
+            <h3>🧾 Récapitulatif</h3>
+            <div id="recap-content" class="recap-content">
+              <!-- Rendu dynamique -->
+            </div>
+          </article>
+
+          <article class="panel ai">
+            <div class="ai-header">
+              <h3>🧠 Synthèse IA</h3>
+              <div class="ai-controls">
+                <details>
+                  <summary>⚙️ Paramètres IA (optionnels)</summary>
+                  <div class="ai-settings">
+                    <label for="ai-backend-url">Backend IA (proxy) — recommandé</label>
+                    <input type="url" id="ai-backend-url" placeholder="http://localhost:5050/ai" />
+                    <p class="hint">Utilisez un proxy local pour protéger votre clé. Voir README.</p>
+                    <label for="ai-api-key">Clé OpenAI (optionnel — usage navigateur non recommandé)</label>
+                    <input type="password" id="ai-api-key" placeholder="sk-..." />
+                    <button type="button" id="ai-save-settings" class="ghost">Enregistrer paramètres</button>
+                  </div>
+                </details>
+                <button type="button" id="ai-synthese-btn" class="secondary">Générer une synthèse</button>
+              </div>
+            </div>
+            <div id="ai-synthese-output" class="ai-output rich" aria-live="polite"></div>
+          </article>
+
+          <div class="score-cards">
+            <article class="score-card">
+              <h3>🪙 Score “Gains” <span class="small">/20</span></h3>
+              <div class="metric"><span>Temps/Coûts (Q15–Q17)</span><span id="score-gains-tc">—</span></div>
+              <div class="bar"><div id="bar-gains-tc" class="bar-fill" style="width:0%"></div></div>
+              <div class="metric"><span>Impact (Q14)</span><span id="score-gains-impact">—</span></div>
+              <div class="bar"><div id="bar-gains-impact" class="bar-fill" style="width:0%"></div></div>
+              <div class="metric total"><span>Total</span><span id="score-gains">—</span></div>
+            </article>
+
+            <article class="score-card">
+              <h3>⚡ Irritants & Urgence <span class="small">/20</span></h3>
+              <div class="metric"><span>Irritant (Q12)</span><span id="score-irr-q12">—</span></div>
+              <div class="bar"><div id="bar-irr-q12" class="bar-fill" style="width:0%"></div></div>
+              <div class="metric"><span>Volumétrie (Q7–Q11)</span><span id="score-irr-vol">—</span></div>
+              <div class="bar"><div id="bar-irr-vol" class="bar-fill" style="width:0%"></div></div>
+              <div class="metric total"><span>Total</span><span id="score-irritants">—</span></div>
+            </article>
+
+            <article class="score-card">
+              <h3>🧮 Faisabilité <span class="small">/20</span></h3>
+              <div class="metric"><span>Caractéristiques (Q13)</span><span id="score-fais-feat">—</span></div>
+              <div class="bar"><div id="bar-fais-feat" class="bar-fill" style="width:0%"></div></div>
+              <div class="metric"><span>Simplicité perçue</span><span id="score-fais-simp">—</span></div>
+              <div class="bar"><div id="bar-fais-simp" class="bar-fill" style="width:0%"></div></div>
+              <div class="metric total"><span>Total</span><span id="score-faisabilite">—</span></div>
+            </article>
+
+            <article class="score-card highlight">
+              <h3>🏁 Score Global Priorité <span class="small">/100</span></h3>
+              <div class="metric mega"><span id="score-global">—</span></div>
+              <div class="bar big"><div id="bar-global" class="bar-fill" style="width:0%"></div></div>
+              <p class="badge" id="score-category">—</p>
+            </article>
+          </div>
+          <p class="hint">Classes recommandées: 🟢 Quick win · 🟡 À challenger · 🔴 Long shot</p>
+
+          <article class="panel ai">
+            <div class="ai-header">
+              <h3>🚚 Delivery IA</h3>
+              <div class="ai-controls">
+                <button type="button" id="ai-delivery-btn" class="secondary">Générer Delivery</button>
+              </div>
+            </div>
+            <div id="ai-delivery-output" class="ai-output rich"></div>
+          </article>
+        </section>
+
+        <div class="pager" role="navigation" aria-label="Navigation du formulaire">
+          <button type="button" id="prev-step" class="ghost" aria-label="Étape précédente">← Précédent</button>
+          <div class="spacer"></div>
+          <button type="button" id="next-step" class="primary" aria-label="Étape suivante">Suivant →</button>
+          <button type="button" id="goto-score" class="secondary" aria-label="Aller au scoring">Voir le scoring 🧮</button>
+        </div>
+
+      </form>
+    </main>
+
+    <footer class="app-footer">
+      <div class="container">
+        <p>© 2025 Diagnostic Process — Prêt pour la priorisation automatisée des use cases 🚀</p>
+      </div>
+    </footer>
+  </body>
+  </html>
+
+

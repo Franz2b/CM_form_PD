@@ -1,0 +1,10 @@
+# Ignorer environnements et secrets
+.venv/
+backend/.venv/
+__pycache__/
+**/__pycache__/
+backend/.env
+.env
+*.env
+node_modules/
+.DS_Store

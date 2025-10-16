@@ -61,6 +61,15 @@ class Priority(str, Enum):
     LONG_SHOT = "Long shot"
 
 
+class DevTime(str, Enum):
+    """Temps de développement estimé - LISTE FERMÉE"""
+    TRES_RAPIDE = "1-2 semaines"
+    RAPIDE = "3-4 semaines"
+    MOYEN = "1-2 mois"
+    LONG = "3-4 mois"
+    TRES_LONG = "6+ mois"
+
+
 # ==================== MODÈLES IMBRIQUÉS ====================
 
 class UserStory(BaseModel):
@@ -104,6 +113,64 @@ class ElementsSources(BaseModel):
     complexity_level: ComplexityLevel
 
 
+class DeliveryPhase(BaseModel):
+    """Une phase de delivery"""
+    model_config = {"extra": "forbid"}
+    
+    phase: int = Field(ge=1)
+    name: str
+    actions: str
+    duration: str
+    main_difficulty: str
+
+
+class QuickWin(BaseModel):
+    """Action en attendant l'automatisation - côté utilisateur"""
+    model_config = {"extra": "forbid"}
+    
+    action: str
+    impact: str
+
+
+class Delivery(BaseModel):
+    """Plan de delivery"""
+    model_config = {"extra": "forbid"}
+    
+    dev_time: DevTime
+    phases: List[DeliveryPhase]
+    quick_wins: List[QuickWin]
+
+
+class ProConArgument(BaseModel):
+    """Un argument pro ou con"""
+    model_config = {"extra": "forbid"}
+    
+    argument: str
+    weight: str
+
+
+class ProCon(BaseModel):
+    """Arguments pour et contre le projet"""
+    model_config = {"extra": "forbid"}
+    
+    pros: List[ProConArgument]
+    cons: List[ProConArgument]
+
+
+class Scoring(BaseModel):
+    """Scoring détaillé sur 100"""
+    model_config = {"extra": "forbid"}
+    
+    impact_business_level: str
+    impact_business_score: int = Field(ge=0, le=40)
+    faisabilite_technique_level: str
+    faisabilite_technique_score: int = Field(ge=0, le=30)
+    urgence_level: str
+    urgence_score: int = Field(ge=0, le=30)
+    total: int = Field(ge=0, le=100)
+    formula: str
+
+
 class Analysis(BaseModel):
     """Analyse qualitative"""
     model_config = {"extra": "forbid"}
@@ -127,6 +194,9 @@ class FormAnalysisResponse(BaseModel):
     execution_schema: ExecutionSchema
     elements_sources: ElementsSources
     analysis: Analysis
+    pro_con: ProCon
+    scoring: Scoring
+    delivery: Delivery
 
 
 # ==================== REQUÊTE ====================

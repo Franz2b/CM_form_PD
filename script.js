@@ -1,5 +1,6 @@
 // ==================== NAVIGATION ULTRA SIMPLE ====================
 let currentStep = 1;
+const TOTAL_STEPS = 6; // Nombre total de pages
 
 window.goToStep = function(step) {
   console.log('>>> GO TO STEP:', step);
@@ -39,12 +40,12 @@ window.goToStep = function(step) {
   const prevBtn = document.getElementById('prev-step');
   const nextBtn = document.getElementById('next-step');
   if (prevBtn) prevBtn.disabled = (step === 1);
-  if (nextBtn) nextBtn.disabled = (step === 5);
+  if (nextBtn) nextBtn.disabled = (step === TOTAL_STEPS);
   
   // Barre de progression
   const progressFill = document.getElementById('progress-fill');
   if (progressFill) {
-    progressFill.style.width = ((step / 5) * 100) + '%';
+    progressFill.style.width = ((step / TOTAL_STEPS) * 100) + '%';
   }
 };
 
@@ -57,7 +58,7 @@ window.goPrev = function() {
 
 window.goNext = function() {
   console.log('>>> NEXT');
-  if (currentStep < 5) {
+  if (currentStep < TOTAL_STEPS) {
     window.goToStep(currentStep + 1);
   }
 };
@@ -434,34 +435,86 @@ document.addEventListener('DOMContentLoaded', function() {
               '<div class="element-badge"><span class="badge-cat">' + escapeHtml(el.category) + '</span> ' + escapeHtml(el.description) + '</div>'
             ).join('')}
           </div>
-          <p><strong>Total :</strong> ${result.elements_sources.count} type(s) | <strong>Complexité :</strong> <span class="complexity-${result.elements_sources.complexity_level.toLowerCase()}">${escapeHtml(result.elements_sources.complexity_level)}</span></p>
+          <p><strong>Types de sources :</strong> ${result.elements_sources.count} | <strong>Complexité :</strong> <span class="complexity-${result.elements_sources.complexity_level.toLowerCase()}">${escapeHtml(result.elements_sources.complexity_level)}</span></p>
         </div>
         
         <div class="analysis-section">
-          <h4>📈 Analyse</h4>
-          <div class="analysis-grid">
-            <div>
-              <strong>Pain points :</strong>
-              <ul>
-                ${result.analysis.pain_points.map(p => '<li>' + escapeHtml(p) + '</li>').join('')}
-              </ul>
+          <h4>🎯 Scoring</h4>
+          <div class="scoring-simple">
+            <div class="scoring-row">
+              <span>Impact Business</span>
+              <span class="level-badge level-${result.scoring.impact_business_level.toLowerCase()}">${result.scoring.impact_business_level}</span>
             </div>
-            <div>
-              <strong>Bénéfices :</strong>
-              <ul>
-                ${result.analysis.benefits.map(b => '<li>' + escapeHtml(b) + '</li>').join('')}
-        </ul>
+            <div class="scoring-row">
+              <span>Faisabilité Technique</span>
+              <span class="level-badge level-${result.scoring.faisabilite_technique_level.toLowerCase()}">${result.scoring.faisabilite_technique_level}</span>
+            </div>
+            <div class="scoring-row">
+              <span>Urgence</span>
+              <span class="level-badge level-${result.scoring.urgence_level.toLowerCase()}">${result.scoring.urgence_level}</span>
+            </div>
+            <div class="scoring-total-row">
+              <span>Score Total</span>
+              <span class="scoring-total-value" title="${escapeHtml(result.scoring.formula)}">${result.scoring.total}/100</span>
             </div>
           </div>
-          <div class="score-summary">
-            <div class="score-item">
-              <span>Score de faisabilité</span>
-              <span class="score-value">${result.analysis.feasibility_score}/100</span>
+        </div>
+        
+        <div class="analysis-section">
+          <h4>⚖️ Argumentaire Pro / Con</h4>
+          <div class="pro-con-grid">
+            <div class="pro-section">
+              <h5 class="pro-title">✅ Arguments POUR</h5>
+              ${result.pro_con.pros.map(pro => 
+                '<div class="pro-con-item pro-item">' +
+                '<div class="pro-con-argument">' + escapeHtml(pro.argument) + '</div>' +
+                '<div class="pro-con-weight weight-' + pro.weight.toLowerCase() + '">' + escapeHtml(pro.weight) + '</div>' +
+                '</div>'
+              ).join('')}
             </div>
-            <div class="score-item priority-${result.analysis.priority.toLowerCase().replace(/ /g, '-')}">
-              <span>Priorité</span>
-              <span class="score-value">${escapeHtml(result.analysis.priority)}</span>
+            <div class="con-section">
+              <h5 class="con-title">⚠️ Arguments CONTRE / Risques</h5>
+              ${result.pro_con.cons.map(con => 
+                '<div class="pro-con-item con-item">' +
+                '<div class="pro-con-argument">' + escapeHtml(con.argument) + '</div>' +
+                '<div class="pro-con-weight weight-' + con.weight.toLowerCase() + '">' + escapeHtml(con.weight) + '</div>' +
+                '</div>'
+              ).join('')}
             </div>
+          </div>
+        </div>
+        
+        <div class="analysis-section">
+          <h4>🚀 Plan de Delivery suggéré</h4>
+          <div class="delivery-time">
+            <strong>Temps total estimé :</strong> <span class="dev-time-badge">${escapeHtml(result.delivery.dev_time)}</span>
+          </div>
+          
+          <div class="phases-simple">
+            ${result.delivery.phases.map(phase => 
+              '<div class="phase-simple-item">' +
+              '<div class="phase-simple-header">' +
+              '<span class="phase-simple-number">' + phase.phase + '</span>' +
+              '<span class="phase-simple-name">' + escapeHtml(phase.name) + '</span>' +
+              '<span class="phase-simple-duration">' + escapeHtml(phase.duration) + '</span>' +
+              '</div>' +
+              '<div class="phase-simple-actions">' + escapeHtml(phase.actions) + '</div>' +
+              '<div class="phase-simple-difficulty">⚡ ' + escapeHtml(phase.main_difficulty) + '</div>' +
+              '</div>'
+            ).join('')}
+          </div>
+        </div>
+        
+        <div class="analysis-section">
+          <h4>💡 En attendant l'automatisation...</h4>
+          <p class="hint" style="margin: 4px 0 12px;">Actions que l'utilisateur peut mettre en place dès maintenant pour améliorer sa situation.</p>
+          <div class="quick-wins-list-single">
+            ${result.delivery.quick_wins.map(qw => 
+              '<div class="quick-win-item">' +
+              '<div class="qw-action">💡 ' + escapeHtml(qw.action) + '</div>' +
+              '<div class="qw-impact">→ ' + escapeHtml(qw.impact) + '</div>' +
+              '</div>'
+            ).join('')}
           </div>
         </div>
       </div>

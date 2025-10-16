@@ -24,6 +24,7 @@
             <li><button type="button" class="wizard-step" onclick="window.goToStep(3)" data-step="3">📊 3. Volumétrie</button></li>
             <li><button type="button" class="wizard-step" onclick="window.goToStep(4)" data-step="4">🔧 4. Nature</button></li>
             <li><button type="button" class="wizard-step" onclick="window.goToStep(5)" data-step="5">👀 5. Synthèse</button></li>
+            <li><button type="button" class="wizard-step" onclick="window.goToStep(6)" data-step="6">🤖 6. IA</button></li>
           </ol>
           <div class="progress"><div id="progress-fill" class="progress-fill" style="width: 20%"></div></div>
         </nav>
@@ -241,57 +242,22 @@
           <h2 id="bloc-5">👀 Synthèse</h2>
 
           <article class="panel recap">
-            <h3>🧾 Récapitulatif</h3>
             <div id="recap-content" class="recap-content">
               <!-- Rendu dynamique -->
             </div>
           </article>
+        </section>
+
+        <section class="step-section" data-step="6" aria-labelledby="bloc-6">
+          <h2 id="bloc-6">🤖 Analyse IA</h2>
 
           <article class="panel">
-            <div class="ai-header">
-              <h3>🤖 Analyse IA</h3>
+            <div class="ai-header" style="justify-content: flex-end;">
               <div class="ai-controls">
                 <button type="button" id="analyze-btn" class="secondary">Analyser le formulaire</button>
               </div>
             </div>
             <div id="ai-analysis-output" class="ai-output"></div>
-          </article>
-
-          <article class="panel editable-recap" hidden>
-            <div class="ai-header">
-              <h3>✏️ User Story & Validation</h3>
-              <div class="ai-controls">
-                <button type="button" id="generate-user-story" class="secondary">Générer User Story</button>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="user-story">User Story éditable</label>
-              <p class="hint">Format : "En tant que [rôle], je veux [action] afin de [bénéfice]"</p>
-              <textarea id="user-story" name="user_story" rows="4" placeholder="En tant que gestionnaire de commandes, je veux automatiser la saisie des factures afin de réduire les erreurs et gagner 2h par jour."></textarea>
-            </div>
-            <div class="form-group">
-              <label for="validation-notes">Notes de validation / Commentaires</label>
-              <textarea id="validation-notes" name="validation_notes" rows="3" placeholder="Points à valider, contraintes identifiées, prochaines étapes..."></textarea>
-            </div>
-          </article>
-
-          <article class="panel ai" hidden>
-            <div class="ai-header">
-              <h3>🧠 Synthèse IA</h3>
-              <div class="ai-controls">
-                <details>
-                  <summary>⚙️ Paramètres IA (optionnels)</summary>
-                  <div class="ai-settings">
-                    <label for="ai-backend-url">Backend IA (proxy sécurisé)</label>
-                    <input type="url" id="ai-backend-url" placeholder="http://localhost:5050/ai" />
-                    <p class="hint">Clé OpenAI stockée côté serveur. Voir README pour lancer le backend.</p>
-                    <button type="button" id="ai-save-settings" class="ghost">Enregistrer paramètres</button>
-                  </div>
-                </details>
-                <button type="button" id="ai-synthese-btn" class="secondary">Générer une synthèse</button>
-              </div>
-            </div>
-            <div id="ai-synthese-output" class="ai-output rich" aria-live="polite"></div>
           </article>
 
         </section>

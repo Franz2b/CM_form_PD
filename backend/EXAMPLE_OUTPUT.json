@@ -1,0 +1,98 @@
+{
+  "user_story": {
+    "html": "<p><strong>En tant que</strong> comptable du service Finance traitant 50 factures PDF quotidiennes,</p><p><strong>j'ai besoin de</strong> automatiser l'extraction des données (montant, fournisseur, date) et leur saisie dans SAP</p><p><strong>afin de</strong> réduire les erreurs de saisie de 80% et gagner 2 heures par jour.</p>",
+    "word_count": 45
+  },
+  "execution_schema": {
+    "ascii_diagram": "┌─────────────────┐\n│ Réception       │\n│ email + PDF     │\n└────────▼────────┘\n┌─────────────────┐\n│ Ouverture PDF   │\n└────────▼────────┘\n┌─────────────────┐\n│ Extraction      │\n│ manuelle        │\n└────────▼────────┘\n┌─────────────────┐\n│ Saisie SAP      │\n└────────▼────────┘\n┌─────────────────┐\n│ Vérification    │\n└─────────────────┘",
+    "steps": [
+      {"step": 1, "description": "Réception email avec facture PDF"},
+      {"step": 2, "description": "Ouverture du PDF"},
+      {"step": 3, "description": "Extraction manuelle des données"},
+      {"step": 4, "description": "Saisie dans SAP"},
+      {"step": 5, "description": "Vérification"}
+    ]
+  },
+  "elements_sources": {
+    "types": [
+      {"category": "PDF", "description": "Factures fournisseurs PDF"},
+      {"category": "Excel", "description": "Fichier de suivi Excel"},
+      {"category": "ERP_CRM", "description": "SAP ERP"}
+    ],
+    "count": 3,
+    "complexity_level": "Semi-structuré"
+  },
+  "analysis": {
+    "pain_points": ["Répétitivité", "Erreurs fréquentes", "Lenteur"],
+    "benefits": ["Gain de temps", "Amélioration qualité", "Réduction coûts"],
+    "feasibility_score": 75,
+    "priority": "Quick win"
+  },
+  "pro_con": {
+    "pros": [
+      {"argument": "Gain de temps massif: 2h/jour × 5 personnes = 10h/jour = 200h/mois économisées", "weight": "Fort"},
+      {"argument": "ROI rapide: développement 3-4 semaines vs 200h/mois économisées", "weight": "Fort"},
+      {"argument": "Réduction erreurs de saisie de 80% → moins de litiges fournisseurs", "weight": "Moyen"},
+      {"argument": "Données semi-structurées (PDF) = faisabilité technique prouvée", "weight": "Moyen"}
+    ],
+    "cons": [
+      {"argument": "Formats PDF variables selon fournisseurs = nécessite gestion multi-formats", "weight": "Moyen"},
+      {"argument": "Intégration SAP peut nécessiter accès API et coordination IT", "weight": "Moyen"},
+      {"argument": "Validation managériale pour montants >10k€ = automatisation partielle", "weight": "Faible"}
+    ]
+  },
+  "scoring": {
+    "impact_business_level": "High",
+    "impact_business_score": 35,
+    "faisabilite_technique_level": "Mid",
+    "faisabilite_technique_score": 22,
+    "urgence_level": "High",
+    "urgence_score": 25,
+    "total": 82,
+    "formula": "Impact Business(35/40) + Faisabilité Technique(22/30) + Urgence(25/30) = 82/100"
+  },
+  "delivery": {
+    "dev_time": "3-4 semaines",
+    "phases": [
+      {
+        "phase": 1,
+        "name": "POC",
+        "actions": "Valider extraction automatique sur 1 format PDF majoritaire + affichage Excel",
+        "duration": "1 semaine",
+        "main_difficulty": "Mise en place OCR et parsing PDF"
+      },
+      {
+        "phase": 2,
+        "name": "MVP",
+        "actions": "App web qui traite 80% des factures (3-4 formats) + validation + injection SAP",
+        "duration": "2-3 semaines",
+        "main_difficulty": "Intégration SAP et gestion multi-formats"
+      },
+      {
+        "phase": 3,
+        "name": "Production",
+        "actions": "Gestion tous formats + notifications + monitoring + documentation",
+        "duration": "1 semaine",
+        "main_difficulty": "Gestion edge cases et robustesse"
+      }
+    ],
+    "quick_wins": [
+      {
+        "action": "En attendant, essaye de créer un template Excel avec formules de validation automatique (HT/TTC, codes...)",
+        "impact": "Réduction immédiate des erreurs de 30% et gain de 15 min par jour"
+      },
+      {
+        "action": "En attendant, essaye de configurer des règles Outlook pour regrouper les factures par fournisseur",
+        "impact": "Gain de 10 min par jour sur la recherche"
+      },
+      {
+        "action": "En attendant, essaye d'apprendre les raccourcis clavier SAP (copie ligne, navigation rapide...)",
+        "impact": "Accélération de la saisie de 20%"
+      },
+      {
+        "action": "En attendant, essaye de traiter les factures par lot (par fournisseur) plutôt qu'une par une",
+        "impact": "Meilleure concentration et réduction charge mentale"
+      }
+    ]
+  }
+}

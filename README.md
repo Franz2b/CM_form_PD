@@ -1,6 +1,6 @@
-# Formulaire Diagnostic Process
+# Formulaire Process Designer
 
-Formulaire en ligne pour qualifier un processus et faciliter la priorisation des cas d'usage avec scoring automatique, synthèses IA et chatbot d'assistance.
+Formulaire d'interview utilisateur pour capturer les besoins d'automatisation et générer des user stories avec analyse IA structurée (Structured Outputs OpenAI).
 
 ## 🚀 Lancer l'application
 
@@ -39,40 +39,74 @@ echo "OPENAI_API_KEY=sk-votre-clé-ici" > .env
 ## 💡 Comment ça fonctionne
 
 **Frontend** (`index.html` + `script.js` + `styles.css`)
-- Formulaire 21 questions → scoring automatique → récapitulatif
-- Autosave dans `localStorage` (aucune donnée envoyée au serveur)
-- Export JSON pour archivage
+- Formulaire 16 questions (+ 4 conditionnelles) → Interview utilisateur guidée
+- Autosave dans `localStorage` (aucune donnée envoyée sans action)
+- Récapitulatif complet en temps réel
 
-**Backend IA** (`backend/main.py`)
-- Proxy FastAPI sécurisé vers OpenAI
-- Génère synthèse + recommandations delivery
-- Clé API reste côté serveur (jamais exposée au navigateur)
+**Backend IA** (`backend/main.py` + `backend/models.py`)
+- FastAPI avec **OpenAI Structured Outputs**
+- Endpoint `/analyze` : Analyse structurée avec JSON **strictement validé**
+- Modèles Pydantic avec **Enums** pour garantir catégories fixes
+- Clé API côté serveur uniquement
 
-**Flux :** Remplir → Auto-save → Générer synthèse IA → Exporter JSON
+**Architecture Structured Outputs :**
+1. Schéma Pydantic définit structure JSON exacte
+2. OpenAI **ne peut pas** dévier du schéma (mode `strict: True`)
+3. Catégories **forcées** par Enums (impossible d'inventer)
+4. Validation double : OpenAI + Pydantic
+
+**Flux :** Remplir → Auto-save → Analyser (IA) → User story + Schéma + Analyse
 
 ---
 
-## 🆕 Nouvelles fonctionnalités
+## 🆕 Structure du formulaire
 
-### ✨ Améliorations récentes
+### 📋 16 questions principales (+ 4 conditionnelles)
 
-1. **Q3 - Exemples d'étapes** : Exemples concrets pour aider à la saisie des étapes clés
-2. **Q4 - Enjeux simplifiés** : Réduction de 7 à 5 catégories (regroupement Conformité/Risques, Satisfaction GO/clients)
-3. **Q13 - Faisabilité technique** : Recentrage sur les critères techniques d'automatisation (API, règles claires, données structurées)
-4. **Q14 - Impacts clarifiés** : Regroupement Qualité/Fiabilité en une seule option
-5. **Q15 - Gains économiques** : Distinction claire entre gain de temps ET gain de coût (champs séparés)
-6. **Q16 - Impact direct** : Clarification de la notion d'impact direct (première personne impactée)
-7. **Q20 - Département** : Liste déroulante avec départements prédéfinis
-8. **User Story éditable** : Section dédiée avec génération automatique et champs de validation
-9. **Chatbot IA** : Widget flottant en bas à droite pour poser des questions pendant le remplissage
-10. **Scoring amélioré** : Séparation claire entre opportunité métier (Q4) et faisabilité technique (Q13)
+**👤 1. Persona (4 questions)**
+- Nom, Prénom, Rôle/Fonction, Département
+- *Capture l'utilisateur final qui bénéficiera de l'automatisation*
 
-### 🤖 Assistance IA
+**💡 2. Contexte & Besoin (2 questions)**
+- Brief utilisateur (texte libre avec guide)
+- Exécution actuelle de la tâche (texte libre)
+- *L'IA analysera automatiquement les pain points et bénéfices*
 
-- **Chatbot contextuel** : Cliquez sur le bouton 💬 en bas à droite pour poser vos questions
-- **Génération User Story** : Bouton dédié dans la section "Scoring & Synthèse"
-- **Synthèse intelligente** : Analyse automatique avec recommandations Go/No-Go
-- **Delivery automatique** : Génération de roadmap et staffing
+**📊 3. Volumétrie & Impact (7 questions)**
+- Fréquence du besoin
+- Nombre d'exécutions par occurrence
+- Temps d'exécution unitaire  
+- Nombre de personnes exécutantes
+- Niveau d'irritant/urgence (+ pourquoi irritant/urgent)
+- *Permet de calculer l'impact total*
+
+**🔧 4. Nature de la tâche (5 questions)**
+- Éléments sources (Excel, PDF, papier...)
+- Action manuelle ? (+ exemple)
+- Règles simples ? (+ exemple complexité)
+- Complexité organisationnelle
+- Outils nécessaires
+- *Permet d'évaluer la faisabilité technique*
+
+**👀 5. Synthèse**
+- Analyse IA structurée
+- Récapitulatif complet
+
+---
+
+## 🤖 Analyse IA avec Structured Outputs
+
+### Garanties
+✅ **Structure JSON fixe** - Toujours les mêmes champs
+✅ **Catégories strictes** - Enums Python (impossible d'inventer)
+✅ **Validation automatique** - Pydantic + OpenAI
+✅ **Comparabilité** - Tous les use cases analysés de la même façon
+
+### Résultats de l'analyse
+1. **User Story** (HTML, max 100 mots) - "En tant que..., j'ai besoin de..., afin de..."
+2. **Schéma d'exécution** (ASCII diagram + liste d'étapes)
+3. **Éléments sources** (catégorisés, comptés, niveau de complexité)
+4. **Analyse** (pain points, bénéfices, score de faisabilité 0-100, priorité)
 
 ---
 
@@ -80,13 +114,15 @@ echo "OPENAI_API_KEY=sk-votre-clé-ici" > .env
 
 ```
 /
-├── index.html       # Formulaire (21 questions, 4 blocs)
-├── styles.css       # Styles modernes, responsive
-├── script.js        # Autosave, scoring, navigation, IA
+├── index.html       # Formulaire (16+4 questions, 5 pages)
+├── styles.css       # Styles modernes, fond blanc
+├── script.js        # Autosave, navigation, appel IA
 └── backend/
-    ├── main.py          # API FastAPI (proxy OpenAI)
-    ├── requirements.txt # Dépendances Python
-    └── .env            # Clé OpenAI (à créer, ignoré par git)
+    ├── main.py              # API FastAPI
+    ├── models.py            # Modèles Pydantic + Enums stricts
+    ├── requirements.txt     # Dépendances Python
+    ├── .env                 # Clé OpenAI (à créer, ignoré par git)
+    └── README_ANALYSIS.md   # Documentation analyse IA
 ```
 
 ---

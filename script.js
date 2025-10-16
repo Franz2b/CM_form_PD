@@ -239,21 +239,22 @@ const STORAGE_KEY = "cm_form_pd_v1";
   if (el) el.style.width = Math.max(0, Math.min(100, pct)) + '%';
 }*/
 
+// ==================== UTILS ====================
+function escapeHtml(s) {
+    return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ==================== RÉCAPITULATIF ====================
   function renderRecap() {
   const recapEl = document.getElementById('recap-content');
     if (!recapEl) return;
   
     const d = serializeForm();
-
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
   
   const html = `
     <div class="recap-section">
@@ -323,7 +324,7 @@ const STORAGE_KEY = "cm_form_pd_v1";
     <div class="recap-section">
       <h3>🔧 Nature de la tâche</h3>
       <div class="recap-item">
-        <div class="recap-label">Q12. Données numériques manipulées</div>
+        <div class="recap-label">Q12. Éléments sources de la tâche</div>
         <div class="recap-value">${escapeHtml(d.q12 || '—').replace(/\n/g, '<br>')}</div>
       </div>
       <div class="recap-item">
@@ -366,22 +367,108 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // Autre controls
-  const otherCheckboxes = form.querySelectorAll('input[type="checkbox"][data-controls]');
-  otherCheckboxes.forEach(function(checkbox) {
-    const controlsId = checkbox.getAttribute("data-controls");
-    const controlled = document.getElementById(controlsId);
-    
-    function update() {
-      if (controlled) {
-        controlled.disabled = !checkbox.checked;
-        controlled.style.opacity = checkbox.checked ? "1" : ".6";
+  // Analyse IA
+  const analyzeBtn = document.getElementById('analyze-btn');
+  const aiAnalysisOutput = document.getElementById('ai-analysis-output');
+  
+  if (analyzeBtn && aiAnalysisOutput) {
+    analyzeBtn.addEventListener('click', async function() {
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = '⏳ Analyse en cours...';
+      aiAnalysisOutput.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 20px;">Analyse IA en cours, veuillez patienter...</p>';
+      
+      try {
+        const formData = serializeForm();
+        
+        const response = await fetch('http://localhost:5050/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ form_data: formData })
+        });
+        
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+        
+        const result = await response.json();
+        displayAnalysisResult(result);
+        
+    } catch (e) {
+        aiAnalysisOutput.innerHTML = '<p style="color: #dc3545; padding: 10px; background: #f8d7da; border-radius: 8px;">❌ Erreur: ' + e.message + '<br>Vérifiez que le backend est lancé (uvicorn main:app --port 5050)</p>';
+      } finally {
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'Analyser le formulaire';
       }
-    }
+    });
+  }
+  
+  function displayAnalysisResult(result) {
+    const output = aiAnalysisOutput;
+    if (!output) return;
     
-    update();
-    checkbox.addEventListener("change", update);
-  });
+    const html = `
+      <div class="analysis-result">
+        <div class="analysis-section">
+          <h4>📝 User Story</h4>
+          <div class="user-story-box">
+            <div class="user-story-content">${result.user_story.html}</div>
+            <p class="word-count">${result.user_story.word_count} mots</p>
+          </div>
+        </div>
+        
+        <div class="analysis-section">
+          <h4>📊 Schéma d'exécution</h4>
+          <pre class="ascii-diagram">${escapeHtml(result.execution_schema.ascii_diagram)}</pre>
+          <div class="steps-list">
+            <strong>Étapes :</strong>
+            <ol>
+              ${result.execution_schema.steps.map(s => '<li>' + escapeHtml(s.description) + '</li>').join('')}
+            </ol>
+          </div>
+        </div>
+        
+        <div class="analysis-section">
+          <h4>🔧 Éléments sources analysés</h4>
+          <div class="elements-grid">
+            ${result.elements_sources.types.map(el => 
+              '<div class="element-badge"><span class="badge-cat">' + escapeHtml(el.category) + '</span> ' + escapeHtml(el.description) + '</div>'
+            ).join('')}
+          </div>
+          <p><strong>Total :</strong> ${result.elements_sources.count} type(s) | <strong>Complexité :</strong> <span class="complexity-${result.elements_sources.complexity_level.toLowerCase()}">${escapeHtml(result.elements_sources.complexity_level)}</span></p>
+        </div>
+        
+        <div class="analysis-section">
+          <h4>📈 Analyse</h4>
+          <div class="analysis-grid">
+            <div>
+              <strong>Pain points :</strong>
+              <ul>
+                ${result.analysis.pain_points.map(p => '<li>' + escapeHtml(p) + '</li>').join('')}
+              </ul>
+            </div>
+            <div>
+              <strong>Bénéfices :</strong>
+              <ul>
+                ${result.analysis.benefits.map(b => '<li>' + escapeHtml(b) + '</li>').join('')}
+        </ul>
+            </div>
+          </div>
+          <div class="score-summary">
+            <div class="score-item">
+              <span>Score de faisabilité</span>
+              <span class="score-value">${result.analysis.feasibility_score}/100</span>
+            </div>
+            <div class="score-item priority-${result.analysis.priority.toLowerCase().replace(/ /g, '-')}">
+              <span>Priorité</span>
+              <span class="score-value">${escapeHtml(result.analysis.priority)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    output.innerHTML = html;
+  }
   
   // Auto-save
   form.addEventListener("input", scheduleSave);

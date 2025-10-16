@@ -163,9 +163,10 @@
           <h2 id="bloc-4">4. Nature de la tâche</h2>
 
           <div class="form-group">
-            <label for="q12">Q12. Quelles données numériques sont manipulées pendant la tâche ?</label>
-            <p class="hint-examples">💡 Exemples : Fichiers Excel, bases de données, PDF, documents Word, images, fichiers papier scannés, audio, e-mails...</p>
-            <textarea id="q12" name="q12" rows="3" placeholder="Ex: Fichiers Excel avec données clients, factures PDF, e-mails de confirmation"></textarea>
+            <label for="q12">Q12. Quels sont les éléments sources de la tâche ?</label>
+            <p class="hint">Quels types de données, documents ou informations sont utilisés/traités dans cette tâche ? (peuvent nécessiter numérisation ou saisie)</p>
+            <p class="hint-examples">💡 Exemples : Fichiers Excel, bases de données, factures PDF, documents papier, e-mails, images/photos, documents Word, fichiers scannés, formulaires web, données d'un système (ERP/CRM)...</p>
+            <textarea id="q12" name="q12" rows="3" placeholder="Ex: Factures PDF reçues par e-mail, fichier Excel de suivi, données extraites de SAP"></textarea>
           </div>
 
           <fieldset class="form-group">
@@ -246,6 +247,16 @@
             </div>
           </article>
 
+          <article class="panel">
+            <div class="ai-header">
+              <h3>🤖 Analyse IA</h3>
+              <div class="ai-controls">
+                <button type="button" id="analyze-btn" class="secondary">Analyser le formulaire</button>
+              </div>
+            </div>
+            <div id="ai-analysis-output" class="ai-output"></div>
+          </article>
+
           <article class="panel editable-recap" hidden>
             <div class="ai-header">
               <h3>✏️ User Story & Validation</h3>
@@ -283,52 +294,6 @@
             <div id="ai-synthese-output" class="ai-output rich" aria-live="polite"></div>
           </article>
 
-          <div class="score-cards" hidden>
-            <article class="score-card">
-              <h3>🪙 Score "Gains" <span class="small">/20</span></h3>
-              <div class="metric"><span>Temps/Coûts (Q15–Q17)</span><span id="score-gains-tc">—</span></div>
-              <div class="bar"><div id="bar-gains-tc" class="bar-fill" style="width:0%"></div></div>
-              <div class="metric"><span>Impact (Q14)</span><span id="score-gains-impact">—</span></div>
-              <div class="bar"><div id="bar-gains-impact" class="bar-fill" style="width:0%"></div></div>
-              <div class="metric total"><span>Total</span><span id="score-gains">—</span></div>
-            </article>
-
-            <article class="score-card">
-              <h3>⚡ Irritants & Urgence <span class="small">/20</span></h3>
-              <div class="metric"><span>Irritant (Q12)</span><span id="score-irr-q12">—</span></div>
-              <div class="bar"><div id="bar-irr-q12" class="bar-fill" style="width:0%"></div></div>
-              <div class="metric"><span>Volumétrie (Q7–Q11)</span><span id="score-irr-vol">—</span></div>
-              <div class="bar"><div id="bar-irr-vol" class="bar-fill" style="width:0%"></div></div>
-              <div class="metric total"><span>Total</span><span id="score-irritants">—</span></div>
-            </article>
-
-            <article class="score-card">
-              <h3>🧮 Faisabilité <span class="small">/20</span></h3>
-              <div class="metric"><span>Caractéristiques (Q13)</span><span id="score-fais-feat">—</span></div>
-              <div class="bar"><div id="bar-fais-feat" class="bar-fill" style="width:0%"></div></div>
-              <div class="metric"><span>Simplicité perçue</span><span id="score-fais-simp">—</span></div>
-              <div class="bar"><div id="bar-fais-simp" class="bar-fill" style="width:0%"></div></div>
-              <div class="metric total"><span>Total</span><span id="score-faisabilite">—</span></div>
-            </article>
-
-            <article class="score-card highlight">
-              <h3>🏁 Score Global Priorité <span class="small">/100</span></h3>
-              <div class="metric mega"><span id="score-global">—</span></div>
-              <div class="bar big"><div id="bar-global" class="bar-fill" style="width:0%"></div></div>
-              <p class="badge" id="score-category">—</p>
-            </article>
-          </div>
-          <p class="hint" hidden>Classes recommandées: 🟢 Quick win · 🟡 À challenger · 🔴 Long shot</p>
-
-          <article class="panel ai" hidden>
-            <div class="ai-header">
-              <h3>🚚 Delivery IA</h3>
-              <div class="ai-controls">
-                <button type="button" id="ai-delivery-btn" class="secondary">Générer Delivery</button>
-              </div>
-            </div>
-            <div id="ai-delivery-output" class="ai-output rich"></div>
-          </article>
         </section>
 
         <div class="pager" role="navigation" aria-label="Navigation du formulaire">

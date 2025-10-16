@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Formulaire Process – Diagnostic terrain</title>
+    <link rel="icon" type="image/png" href="media/trident.png" />
     <link rel="stylesheet" href="styles.css" />
     <script defer src="script.js"></script>
   </head>
@@ -30,6 +31,7 @@
         </nav>
 
         <section class="step-section is-active" data-step="1" aria-labelledby="bloc-1">
+          <h2 id="bloc-1">1. Persona</h2>
           <p class="hint">Informations sur l'utilisateur final qui bénéficiera de l'automatisation.</p>
           
           <div class="form-group">
@@ -69,11 +71,12 @@
         </section>
 
         <section class="step-section" data-step="2" aria-labelledby="bloc-2">
+          <h2 id="bloc-2">2. Contexte & Besoin</h2>
           <p class="hint">Décrivez le contexte et le besoin utilisateur. L'IA analysera automatiquement les pain points et bénéfices.</p>
 
           <div class="form-group">
             <label for="q5">Q5. Brief utilisateur - Contexte et besoin</label>
-            <p class="hint">Soyez concret et donnez des exemples ! Décrivez le contexte et le besoin utilisateur. L'IA analysera automatiquement les pain points et bénéfices.</p>
+            <p class="hint">Soyez concret et donnez des exemples !</p>
             <textarea id="q5" name="q5" rows="6" placeholder="Décrivez :&#10;• Quelle est la situation actuelle ?&#10;• Quel est le problème rencontré ?&#10;• Quel serait le résultat souhaité après automatisation ?&#10;&#10;Exemple : 'Actuellement, je reçois 50 factures par jour par e-mail. Je dois manuellement extraire les données (montant, fournisseur, date) et les saisir dans notre ERP. C'est long, répétitif et source d'erreurs. Je voudrais que ces données soient automatiquement extraites et intégrées dans l'ERP.'" required></textarea>
           </div>
 
@@ -85,6 +88,7 @@
         </section>
 
         <section class="step-section" data-step="3" aria-labelledby="bloc-3">
+          <h2 id="bloc-3">3. Volumétrie & Impact</h2>
 
           <fieldset class="form-group">
             <legend>Q7. Fréquence du besoin</legend>
@@ -158,6 +162,7 @@
         </section>
 
         <section class="step-section" data-step="4" aria-labelledby="bloc-4">
+          <h2 id="bloc-4">4. Nature de la tâche</h2>
 
           <div class="form-group">
             <label for="q14">Q14. Quels sont les éléments sources de la tâche ?</label>
@@ -241,6 +246,7 @@
         </section>
 
         <section class="step-section" data-step="5" aria-labelledby="bloc-5">
+          <h2 id="bloc-5">👀 Synthèse</h2>
 
           <article class="panel recap">
             <div id="recap-content" class="recap-content">
@@ -250,6 +256,7 @@
         </section>
 
         <section class="step-section" data-step="6" aria-labelledby="bloc-6">
+          <h2 id="bloc-6">🤖 Analyse IA</h2>
 
           <article class="panel">
             <div class="ai-header" style="justify-content: flex-end;">

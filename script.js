@@ -493,7 +493,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <div class="gain-temps-box">
                 <strong>⏱️ Gain de temps estimé :</strong> ${result.scoring.gain_temps_mensuel_heures}h/mois
                 <div style="margin-top: 4px; font-size: 13px; color: #6c757d;">
-                  = ${(result.scoring.gain_temps_mensuel_heures / 100).toFixed(1)} ETP <span style="font-size: 11px;">(base 5h/jour × 20 jours)</span>
+                  = ${(result.scoring.gain_temps_mensuel_heures / 140).toFixed(1)} ETP <span style="font-size: 11px;">(base 7h/jour × 20 jours)</span>
                 </div>
               </div>
             </div>

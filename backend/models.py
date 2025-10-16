@@ -76,6 +76,7 @@ class UserStory(BaseModel):
     """User story générée - Format: En tant que X, j'ai besoin de Y afin de Z (max 100 mots)"""
     model_config = {"extra": "forbid"}
     
+    project_name: str
     html: str
     word_count: int = Field(ge=0, le=100)
 
@@ -89,11 +90,10 @@ class ExecutionStep(BaseModel):
 
 
 class ExecutionSchema(BaseModel):
-    """Schéma d'exécution - Diagramme ASCII + étapes"""
+    """Schéma d'exécution - Diagramme ASCII uniquement"""
     model_config = {"extra": "forbid"}
     
     ascii_diagram: str
-    steps: List[ExecutionStep]
 
 
 class ElementSource(BaseModel):
@@ -119,9 +119,9 @@ class DeliveryPhase(BaseModel):
     
     phase: int = Field(ge=1)
     name: str
-    actions: str
+    feature_principale: str
+    risque_principal: str
     duration: str
-    main_difficulty: str
 
 
 class QuickWin(BaseModel):
@@ -169,6 +169,8 @@ class Scoring(BaseModel):
     urgence_score: int = Field(ge=0, le=30)
     total: int = Field(ge=0, le=100)
     formula: str
+    justification: str
+    gain_temps_mensuel_heures: int = Field(ge=0)
 
 
 class Analysis(BaseModel):
@@ -214,15 +216,15 @@ class FormData(BaseModel):
     q9: Optional[str] = None  # Temps unitaire
     q10: Optional[str] = None  # Nb personnes
     q11: Optional[str] = None  # Niveau irritant
-    q11a: Optional[str] = None  # Pourquoi irritant
-    q11b: Optional[str] = None  # Pourquoi urgent
-    q12: Optional[str] = None  # Éléments sources
-    q13: Optional[str] = None  # Action manuelle
-    q13a: Optional[str] = None  # Exemple action manuelle
-    q14: Optional[str] = None  # Règles simples
-    q14a: Optional[str] = None  # Exemple règle complexe
-    q15: Optional[str] = None  # Complexité orga
-    q16: Optional[str] = None  # Outils
+    q12: Optional[str] = None  # Pourquoi irritant
+    q13: Optional[str] = None  # Pourquoi urgent
+    q14: Optional[str] = None  # Éléments sources
+    q15: Optional[str] = None  # Action manuelle
+    q16: Optional[str] = None  # Exemple action manuelle
+    q17: Optional[str] = None  # Règles simples
+    q18: Optional[str] = None  # Points complexes
+    q19: Optional[str] = None  # Complexité orga
+    q20: Optional[str] = None  # Outils
 
 
 class AnalyzeRequest(BaseModel):

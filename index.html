@@ -150,13 +150,13 @@
           </fieldset>
 
           <div class="form-group">
-            <label for="q11a">Q11a. Pourquoi est-ce irritant ?</label>
-            <textarea id="q11a" name="q11a" rows="2" placeholder="Ex: Tâche répétitive sans valeur ajoutée, nombreuses erreurs de saisie..."></textarea>
+            <label for="q12">Q12. Pourquoi est-ce irritant ?</label>
+            <textarea id="q12" name="q12" rows="2" placeholder="Ex: Tâche répétitive sans valeur ajoutée, nombreuses erreurs de saisie..."></textarea>
           </div>
 
           <div class="form-group">
-            <label for="q11b">Q11b. Pourquoi est-ce urgent ?</label>
-            <textarea id="q11b" name="q11b" rows="2" placeholder="Ex: Impact direct sur satisfaction client, risque de non-conformité..."></textarea>
+            <label for="q13">Q13. Pourquoi est-ce urgent ?</label>
+            <textarea id="q13" name="q13" rows="2" placeholder="Ex: Impact direct sur satisfaction client, risque de non-conformité..."></textarea>
           </div>
         </section>
 
@@ -164,52 +164,58 @@
           <h2 id="bloc-4">4. Nature de la tâche</h2>
 
           <div class="form-group">
-            <label for="q12">Q12. Quels sont les éléments sources de la tâche ?</label>
+            <label for="q14">Q14. Quels sont les éléments sources de la tâche ?</label>
             <p class="hint">Quels types de données, documents ou informations sont utilisés/traités dans cette tâche ? (peuvent nécessiter numérisation ou saisie)</p>
             <p class="hint-examples">💡 Exemples : Fichiers Excel, bases de données, factures PDF, documents papier, e-mails, images/photos, documents Word, fichiers scannés, formulaires web, données d'un système (ERP/CRM)...</p>
-            <textarea id="q12" name="q12" rows="3" placeholder="Ex: Factures PDF reçues par e-mail, fichier Excel de suivi, données extraites de SAP"></textarea>
+            <textarea id="q14" name="q14" rows="3" placeholder="Ex: Factures PDF reçues par e-mail, fichier Excel de suivi, données extraites de SAP"></textarea>
           </div>
 
           <fieldset class="form-group">
-            <legend>Q13. La tâche inclut-elle une action manuelle ?</legend>
+            <legend>Q15. La tâche inclut-elle une action manuelle ?</legend>
             <div class="options" role="radiogroup">
-              <label><input type="radio" name="q13" value="Oui" /> Oui</label>
-              <label><input type="radio" name="q13" value="Non" /> Non</label>
+              <label><input type="radio" name="q15" value="Oui" /> Oui</label>
+              <label><input type="radio" name="q15" value="Non" /> Non</label>
             </div>
           </fieldset>
 
           <div class="form-group">
-            <label for="q13a">Q13a. Si oui, donnez un exemple d'action manuelle</label>
-            <textarea id="q13a" name="q13a" rows="2" placeholder="Ex: Copier-coller de données entre Excel et SAP, vérification visuelle de cohérence, saisie manuelle de codes..."></textarea>
+            <label for="q16">Q16. Si oui, donnez un exemple d'action manuelle</label>
+            <textarea id="q16" name="q16" rows="2" placeholder="Ex: Copier-coller de données entre Excel et SAP, vérification visuelle de cohérence, saisie manuelle de codes..."></textarea>
           </div>
 
           <fieldset class="form-group">
-            <legend>Q14. La tâche peut-elle être reproduite avec des règles simples et stables ?</legend>
+            <legend>Q17. La tâche peut-elle être reproduite avec des règles simples et stables ?</legend>
             <div class="options" role="radiogroup">
-              <label><input type="radio" name="q14" value="Oui" /> Oui — Règles claires et stables</label>
-              <label><input type="radio" name="q14" value="Partiellement" /> Partiellement — Quelques cas particuliers</label>
-              <label><input type="radio" name="q14" value="Non" /> Non — Beaucoup d'exceptions, jugement métier important</label>
+              <label><input type="radio" name="q17" value="Oui" /> Oui — Règles claires et stables</label>
+              <label><input type="radio" name="q17" value="Partiellement" /> Partiellement — Quelques cas particuliers</label>
+              <label><input type="radio" name="q17" value="Non" /> Non — Beaucoup d'exceptions, jugement métier important</label>
             </div>
           </fieldset>
 
           <div class="form-group">
-            <label for="q14a">Q14a. Si partiellement ou non, donnez un exemple de la règle/cas le plus complexe</label>
-            <textarea id="q14a" name="q14a" rows="2" placeholder="Ex: Certains fournisseurs envoient des formats différents, nécessite validation manager si montant > 10k€..."></textarea>
+            <label for="q18">Q18. Listez les points les plus complexes de la tâche</label>
+            <p class="hint">Détaillez précisément ce qui rend cette tâche difficile, les cas particuliers, les exceptions, les points de vigilance...</p>
+            <textarea id="q18" name="q18" rows="4" placeholder="Ex: 
+• Formats PDF très variables (scannés vs natifs, layouts différents)
+• Validation manager obligatoire si montant > 10k€
+• Codes analytiques complexes à choisir selon le type de dépense
+• Gestion des devises multiples avec taux de change du jour
+• Délais de traitement stricts (factures à saisir sous 48h)"></textarea>
           </div>
 
           <fieldset class="form-group">
-            <legend>Q15. Complexité organisationnelle</legend>
+            <legend>Q19. Complexité organisationnelle</legend>
             <p class="hint">La tâche nécessite-t-elle la coordination ou validation d'autres personnes ?</p>
             <div class="options" role="radiogroup">
-              <label><input type="radio" name="q15" value="Simple" /> Simple — Une personne peut faire la tâche seule</label>
-              <label><input type="radio" name="q15" value="Moyenne" /> Moyenne — Nécessite une validation d'une autre personne</label>
-              <label><input type="radio" name="q15" value="Complexe" /> Complexe — Coordination de plusieurs personnes/services</label>
+              <label><input type="radio" name="q19" value="Simple" /> Simple — Une personne peut faire la tâche seule</label>
+              <label><input type="radio" name="q19" value="Moyenne" /> Moyenne — Nécessite une validation d'une autre personne</label>
+              <label><input type="radio" name="q19" value="Complexe" /> Complexe — Coordination de plusieurs personnes/services</label>
             </div>
           </fieldset>
 
           <div class="form-group">
-            <label for="q16">Q16. Quels sont les outils nécessaires pour réaliser cette tâche ?</label>
-            <input type="text" id="q16" name="q16" placeholder="Ex: Excel + SAP + e-mails, Salesforce + Google Sheets..." />
+            <label for="q20">Q20. Quels sont les outils nécessaires pour réaliser cette tâche ?</label>
+            <input type="text" id="q20" name="q20" placeholder="Ex: Excel + SAP + e-mails, Salesforce + Google Sheets..." />
           </div>
         </section>
 
@@ -258,6 +264,7 @@
               </div>
             </div>
             <div id="ai-analysis-output" class="ai-output"></div>
+            <div id="save-status" class="save-status" style="display:none;"></div>
           </article>
 
         </section>

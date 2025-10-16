@@ -2,6 +2,8 @@ import os
 import json
 import logging
 import time
+from datetime import datetime
+from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -40,6 +42,7 @@ async def startup_event():
     logger.info("  - GET  /health")
     logger.info("  - POST /ai")
     logger.info("  - POST /analyze (Structured Outputs)")
+    logger.info("  - POST /save (Sauvegarde use case)")
     logger.info("=" * 80 + "\n")
 
 app.add_middleware(
@@ -134,60 +137,73 @@ Nb exécutions/occurrence: """ + (d.q8 or '-') + """
 Temps unitaire: """ + (d.q9 or '-') + """
 Nb personnes: """ + (d.q10 or '-') + """
 Irritant: """ + (d.q11 or '3') + """/5
-Pourquoi irritant: """ + (d.q11a or '-') + """
-Pourquoi urgent: """ + (d.q11b or '-') + """
+Pourquoi irritant: """ + (d.q12 or '-') + """
+Pourquoi urgent: """ + (d.q13 or '-') + """
 
 === NATURE TÂCHE ===
-Éléments sources: """ + (d.q12 or '-') + """
-Action manuelle: """ + (d.q13 or '-') + """
-Exemple action: """ + (d.q13a or '-') + """
-Règles simples: """ + (d.q14 or '-') + """
-Exemple complexité: """ + (d.q14a or '-') + """
-Complexité orga: """ + (d.q15 or '-') + """
-Outils: """ + (d.q16 or '-') + """
+Éléments sources: """ + (d.q14 or '-') + """
+Action manuelle: """ + (d.q15 or '-') + """
+Exemple action: """ + (d.q16 or '-') + """
+Règles simples: """ + (d.q17 or '-') + """
+Points complexes: """ + (d.q18 or '-') + """
+Complexité orga: """ + (d.q19 or '-') + """
+Outils: """ + (d.q20 or '-') + """
 
 === INSTRUCTIONS ===
-1. USER STORY: Génère une user story HTML (max 100 mots) AVEC CONTEXTE.
-   Format: <p><strong>En tant que</strong> [rôle + contexte département/volumétrie],</p>
-           <p><strong>j'ai besoin de</strong> [besoin détaillé]</p>
-           <p><strong>afin de</strong> [bénéfice concret et mesurable].</p>
-   Exemple: "En tant que comptable du service Finance traitant 50 factures quotidiennes..."
+1. USER STORY:
+   - project_name: Génère un NOM DE PROJET court et impactant (3-6 mots max)
+     Exemple: "Automatisation Saisie Factures SAP" ou "Robot Rapprochement Comptable"
+   - html: User story HTML (max 100 mots) AVEC CONTEXTE
+     Format: <p><strong>En tant que</strong> [rôle + contexte département/volumétrie],</p>
+             <p><strong>j'ai besoin de</strong> [besoin détaillé]</p>
+             <p><strong>afin de</strong> [bénéfice concret et mesurable].</p>
 
-2. EXECUTION SCHEMA: Diagramme ASCII vertical + liste étapes
+2. EXECUTION SCHEMA: Diagramme ASCII vertical UNIQUEMENT (pas de liste étapes)
 
-3. ELEMENTS SOURCES:
-   - types: Catégorise STRICTEMENT chaque source/document mentionné avec UNE catégorie
-   - count: Nombre de TYPES UNIQUES différents (ex: si "Excel GL" + "Excel OSB" = 1 seul type "Excel", donc count=1)
-     IMPORTANT: Compte les types UNIQUES, pas le nombre total de sources!
-     Exemple: "Factures PDF + Excel suivi + SAP" = 3 types (PDF, Excel, ERP_CRM)
-     Exemple: "Excel GL + Excel OSB + SAP" = 2 types (Excel, ERP_CRM)
+3. ELEMENTS SOURCES (Q14):
+   - types: Catégorise STRICTEMENT
+   - count: Nombre de TYPES UNIQUES (Excel GL + Excel OSB = 1 seul type)
    - complexity_level: Structuré/Semi-structuré/Non-structuré
 
-4. ANALYSIS: Pain points, bénéfices (LISTES STRICTES), score faisabilité, priorité
+4. ANALYSIS: Pain points, bénéfices, score faisabilité, priorité
 
 5. PRO/CON:
-   - pros: 3-5 arguments POUR (volumétrie, ROI, urgence). Chaque: argument + weight (Faible/Moyen/Fort)
-   - cons: 2-4 arguments CONTRE/risques. Chaque: argument + weight (Faible/Moyen/Fort)
+   - pros: 3-5 arguments POUR. Chaque: argument + weight (Faible/Moyen/Fort)
+   - cons: 2-4 arguments CONTRE. Chaque: argument + weight (Faible/Moyen/Fort)
 
-6. SCORING sur 100:
-   - impact_business_level: "Low" (<15/40) ou "Mid" (15-28/40) ou "High" (>28/40)
-   - impact_business_score: Score 0-40
-   - faisabilite_technique_level: "Low" / "Mid" / "High"
-   - faisabilite_technique_score: Score 0-30
-   - urgence_level: "Low" / "Mid" / "High"
-   - urgence_score: Score 0-30
-   - total: Somme des 3 scores
-   - formula: Formule de calcul détaillée (ex: "Impact(35) + Faisabilité(22) + Urgence(25) = 82/100")
+6. SCORING sur 100 - FORMULE STANDARDISÉE:
+   
+   IMPACT BUSINESS (0-40) = Q7 + Q8 + Q9 + Q10
+   - Q7 Fréquence: Quotidien=10, Hebdo=7, Mensuel=4, Occasionnel=2
+   - Q8 NbExec: 200+=10, 51-200=7, 11-50=5, 2-10=3, 1=1
+   - Q9 Temps: >2h=10, 1-2h=7, 30min-1h=5, 10-30min=3, <10min=1
+   - Q10 NbPersonnes: 50+=10, 21-50=7, 6-20=5, 2-5=3, 1=1
+   
+   FAISABILITÉ (0-30) = Q17 + count(IA) + Q19 + Q15
+   - Q17 Règles: Oui=10, Partiellement=6, Non=2
+   - count TypesSources (IA): 1-2=10, 3-4=6, 5+=2
+   - Q19 ComplexitéOrga: Simple=7, Moyenne=4, Complexe=1
+   - Q15 ActionManuelle: Non=3, Oui=0
+   
+   URGENCE (0-30) = Q11 × 6
+   
+   GAIN TEMPS MENSUEL = Calcule le gain de temps estimé en heures par mois (20 jours ouvrés)
+   Formule: Q7_fréquence × Q8_nbExec × Q9_temps_moyen × 20 jours
+   Exemple: Quotidien (1/jour) × 50 exec × 20min (0.33h) × 20 jours = 330h/mois
+   
+   Remplis:
+   - formula: "Impact[Fréquence(Quotidien=10) + NbExec(51-200=7) + ...] = XX/40] + Faisabilité[...] = YY/30] + Urgence[...] = ZZ/30] = Total WW/100"
+   - justification: 2-3 phrases
+   - gain_temps_mensuel_heures: Ton calcul en heures par mois
 
 7. DELIVERY:
    - dev_time: Temps total
-   - phases (2-3): Phases SIMPLES et ACTIONNABLES
-     Chaque phase: 
-     * name: Nom simple (ex: "POC", "MVP", "Production")
-     * actions: Description courte et actionnable de ce qui sera fait
-     * duration: Durée estimée
-     * main_difficulty: UNE phrase très succincte sur la difficulté principale qui porte le délai
-   - quick_wins (3-5): "En attendant, essaye de..." (UNIQUEMENT utilisateur)
+   - phases (2-3): Phases simples
+     * name: POC / MVP / Production
+     * feature_principale: LA feature principale exploitable
+     * risque_principal: LE risque principal
+     * duration: Durée
+   - quick_wins (3-5): "En attendant, essaye de..."
 """
 
     try:
@@ -307,5 +323,101 @@ Outils: """ + (d.q16 or '-') + """
         logger.error(traceback.format_exc())
         error_detail = f"Erreur OpenAI: {str(e)}"
         raise HTTPException(status_code=502, detail=error_detail)
+
+
+class SaveRequest(BaseModel):
+    """Requête de sauvegarde"""
+    form_data: FormData
+    ai_analysis: FormAnalysisResponse
+
+
+@app.post("/save")
+async def save_use_case(req: SaveRequest):
+    """
+    Sauvegarde le use case complet (formulaire + résultats IA) dans un fichier JSON.
+    Format: YYYYMMDD_HHMMSS_[persona].json
+    """
+    try:
+        # Créer le dossier use_cases
+        use_cases_dir = Path(__file__).parent / "use_cases"
+        use_cases_dir.mkdir(exist_ok=True)
+        
+        # Générer nom de fichier avec datetime
+        now = datetime.now()
+        timestamp = now.strftime("%Y%m%d_%H%M%S")
+        
+        # Nom basé sur persona
+        persona = f"{req.form_data.q1 or 'user'}_{req.form_data.q2 or 'unknown'}"
+        clean_name = "".join(c if c.isalnum() or c in ('_',) else '_' for c in persona)[:30]
+        
+        filename = f"{timestamp}_{clean_name}.json"
+        filepath = use_cases_dir / filename
+        
+        # Transformer les clés du formulaire en noms parlants
+        d = req.form_data
+        form_data_readable = {
+            "persona": {
+                "nom": d.q1,
+                "prenom": d.q2,
+                "role": d.q3,
+                "departement": d.q4
+            },
+            "contexte_besoin": {
+                "brief_utilisateur": d.q5,
+                "execution_actuelle": d.q6
+            },
+            "volumetrie": {
+                "frequence_besoin": d.q7,
+                "nb_executions_par_occurrence": d.q8,
+                "temps_execution_unitaire": d.q9,
+                "nb_personnes_executantes": d.q10,
+                "niveau_irritant": d.q11,
+                "pourquoi_irritant": d.q12,
+                "pourquoi_urgent": d.q13
+            },
+            "nature_tache": {
+                "elements_sources": d.q14,
+                "action_manuelle": d.q15,
+                "exemple_action_manuelle": d.q16,
+                "regles_simples_stables": d.q17,
+                "points_complexes_detailles": d.q18,
+                "complexite_organisationnelle": d.q19,
+                "outils_necessaires": d.q20
+            }
+        }
+        
+        # Construire JSON complet
+        complete_data = {
+            "metadata": {
+                "saved_at": now.isoformat(),
+                "project_name": req.ai_analysis.user_story.project_name,
+                "persona": f"{d.q1} {d.q2}",
+                "role": d.q3,
+                "department": d.q4,
+                "score": req.ai_analysis.scoring.total,
+                "priority": req.ai_analysis.analysis.priority
+            },
+            "form_data": form_data_readable,
+            "ai_analysis": req.ai_analysis.model_dump()
+        }
+        
+        # Sauvegarder
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(complete_data, f, indent=2, ensure_ascii=False)
+        
+        logger.info(f"💾 Use case sauvegardé: {filename}")
+        logger.info(f"   Persona: {req.form_data.q1} {req.form_data.q2}")
+        logger.info(f"   Score: {req.ai_analysis.scoring.total}/100")
+        logger.info(f"   Fichier: {filepath}")
+        
+        return {
+            "success": True,
+            "filename": filename,
+            "path": str(filepath)
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur sauvegarde: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erreur sauvegarde: {str(e)}")
 
 

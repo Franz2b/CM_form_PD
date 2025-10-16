@@ -313,44 +313,44 @@ function escapeHtml(s) {
         <div class="recap-value">${escapeHtml(d.q11 || '3')}/5</div>
       </div>
       <div class="recap-item">
-        <div class="recap-label">Q11a. Pourquoi irritant</div>
-        <div class="recap-value">${escapeHtml(d.q11a || '—')}</div>
+        <div class="recap-label">Q12. Pourquoi irritant</div>
+        <div class="recap-value">${escapeHtml(d.q12 || '—')}</div>
       </div>
       <div class="recap-item">
-        <div class="recap-label">Q11b. Pourquoi urgent</div>
-        <div class="recap-value">${escapeHtml(d.q11b || '—')}</div>
+        <div class="recap-label">Q13. Pourquoi urgent</div>
+        <div class="recap-value">${escapeHtml(d.q13 || '—')}</div>
       </div>
     </div>
 
     <div class="recap-section">
       <h3>🔧 Nature de la tâche</h3>
       <div class="recap-item">
-        <div class="recap-label">Q12. Éléments sources de la tâche</div>
-        <div class="recap-value">${escapeHtml(d.q12 || '—').replace(/\n/g, '<br>')}</div>
+        <div class="recap-label">Q14. Éléments sources de la tâche</div>
+        <div class="recap-value">${escapeHtml(d.q14 || '—').replace(/\n/g, '<br>')}</div>
       </div>
       <div class="recap-item">
-        <div class="recap-label">Q13. Action manuelle ?</div>
-        <div class="recap-value">${escapeHtml(d.q13 || '—')}</div>
-      </div>
-      <div class="recap-item">
-        <div class="recap-label">Q13a. Exemple d'action manuelle</div>
-        <div class="recap-value">${escapeHtml(d.q13a || '—')}</div>
-      </div>
-      <div class="recap-item">
-        <div class="recap-label">Q14. Règles simples et stables ?</div>
-        <div class="recap-value">${escapeHtml(d.q14 || '—')}</div>
-      </div>
-      <div class="recap-item">
-        <div class="recap-label">Q14a. Exemple règle/cas complexe</div>
-        <div class="recap-value">${escapeHtml(d.q14a || '—')}</div>
-      </div>
-      <div class="recap-item">
-        <div class="recap-label">Q15. Complexité organisationnelle</div>
+        <div class="recap-label">Q15. Action manuelle ?</div>
         <div class="recap-value">${escapeHtml(d.q15 || '—')}</div>
       </div>
       <div class="recap-item">
-        <div class="recap-label">Q16. Outils nécessaires</div>
+        <div class="recap-label">Q16. Exemple d'action manuelle</div>
         <div class="recap-value">${escapeHtml(d.q16 || '—')}</div>
+      </div>
+      <div class="recap-item">
+        <div class="recap-label">Q17. Règles simples et stables ?</div>
+        <div class="recap-value">${escapeHtml(d.q17 || '—')}</div>
+      </div>
+      <div class="recap-item">
+        <div class="recap-label">Q18. Points complexes détaillés</div>
+        <div class="recap-value">${escapeHtml(d.q18 || '—').replace(/\n/g, '<br>')}</div>
+      </div>
+      <div class="recap-item">
+        <div class="recap-label">Q19. Complexité organisationnelle</div>
+        <div class="recap-value">${escapeHtml(d.q19 || '—')}</div>
+      </div>
+      <div class="recap-item">
+        <div class="recap-label">Q20. Outils nécessaires</div>
+        <div class="recap-value">${escapeHtml(d.q20 || '—')}</div>
       </div>
     </div>
   `;
@@ -370,6 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Analyse IA
   const analyzeBtn = document.getElementById('analyze-btn');
+  const saveStatus = document.getElementById('save-status');
   const aiAnalysisOutput = document.getElementById('ai-analysis-output');
   
   if (analyzeBtn && aiAnalysisOutput) {
@@ -377,13 +378,14 @@ document.addEventListener('DOMContentLoaded', function() {
       analyzeBtn.disabled = true;
       analyzeBtn.textContent = '⏳ Analyse en cours...';
       aiAnalysisOutput.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 20px;">Analyse IA en cours, veuillez patienter...</p>';
+      if (saveStatus) saveStatus.style.display = 'none';
       
       try {
         const formData = serializeForm();
         
         const response = await fetch('http://localhost:5050/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ form_data: formData })
         });
         
@@ -392,9 +394,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const result = await response.json();
+        currentAnalysisResult = { form_data: formData, ai_analysis: result };
         displayAnalysisResult(result);
         
-    } catch (e) {
+        // Sauvegarder automatiquement
+        await autoSaveUseCase(formData, result);
+        
+      } catch (e) {
         aiAnalysisOutput.innerHTML = '<p style="color: #dc3545; padding: 10px; background: #f8d7da; border-radius: 8px;">❌ Erreur: ' + e.message + '<br>Vérifiez que le backend est lancé (uvicorn main:app --port 5050)</p>';
       } finally {
         analyzeBtn.disabled = false;
@@ -403,12 +409,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
+  // Sauvegarde automatique du use case
+  async function autoSaveUseCase(formData, aiResult) {
+    try {
+      const response = await fetch('http://localhost:5050/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ form_data: formData, ai_analysis: aiResult })
+      });
+      
+      if (!response.ok) {
+        throw new Error('HTTP ' + response.status);
+      }
+      
+        const result = await response.json();
+        // Sauvegarde silencieuse (pas de message affiché)
+        console.log('💾 Use case sauvegardé:', result.filename);
+        
+    } catch (e) {
+        // Sauvegarde silencieuse - erreur non affichée
+        console.error('⚠️ Erreur sauvegarde:', e);
+      }
+  }
+  
   function displayAnalysisResult(result) {
     const output = aiAnalysisOutput;
     if (!output) return;
     
     const html = `
       <div class="analysis-result">
+        <div class="project-name-section">
+          <h3 class="project-name">🎯 ${escapeHtml(result.user_story.project_name)}</h3>
+        </div>
+        
         <div class="analysis-section">
           <h4>📝 User Story</h4>
           <div class="user-story-box">
@@ -420,12 +453,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="analysis-section">
           <h4>📊 Schéma d'exécution</h4>
           <pre class="ascii-diagram">${escapeHtml(result.execution_schema.ascii_diagram)}</pre>
-          <div class="steps-list">
-            <strong>Étapes :</strong>
-            <ol>
-              ${result.execution_schema.steps.map(s => '<li>' + escapeHtml(s.description) + '</li>').join('')}
-            </ol>
-          </div>
         </div>
         
         <div class="analysis-section">
@@ -440,23 +467,46 @@ document.addEventListener('DOMContentLoaded', function() {
         
         <div class="analysis-section">
           <h4>🎯 Scoring</h4>
-          <div class="scoring-simple">
-            <div class="scoring-row">
-              <span>Impact Business</span>
-              <span class="level-badge level-${result.scoring.impact_business_level.toLowerCase()}">${result.scoring.impact_business_level}</span>
+          <div class="scoring-grid">
+            <div class="scoring-left">
+              <div class="scoring-row">
+                <span>Impact Business</span>
+                <div class="score-with-badge">
+                  <span class="score-number">${Math.round((result.scoring.impact_business_score / 40) * 100)}/100</span>
+                  <span class="level-badge level-${result.scoring.impact_business_level.toLowerCase()}">${result.scoring.impact_business_level}</span>
+                </div>
+              </div>
+              <div class="scoring-row">
+                <span>Faisabilité Technique</span>
+                <div class="score-with-badge">
+                  <span class="score-number">${Math.round((result.scoring.faisabilite_technique_score / 30) * 100)}/100</span>
+                  <span class="level-badge level-${result.scoring.faisabilite_technique_level.toLowerCase()}">${result.scoring.faisabilite_technique_level}</span>
+                </div>
+              </div>
+              <div class="scoring-row">
+                <span>Urgence</span>
+                <div class="score-with-badge">
+                  <span class="score-number">${Math.round((result.scoring.urgence_score / 30) * 100)}/100</span>
+                  <span class="level-badge level-${result.scoring.urgence_level.toLowerCase()}">${result.scoring.urgence_level}</span>
+                </div>
+              </div>
+              <div class="gain-temps-box">
+                <strong>⏱️ Gain de temps estimé :</strong> ${result.scoring.gain_temps_mensuel_heures}h/mois
+                <div style="margin-top: 4px; font-size: 13px; color: #6c757d;">
+                  = ${(result.scoring.gain_temps_mensuel_heures / 100).toFixed(1)} ETP <span style="font-size: 11px;">(base 5h/jour × 20 jours)</span>
+                </div>
+              </div>
             </div>
-            <div class="scoring-row">
-              <span>Faisabilité Technique</span>
-              <span class="level-badge level-${result.scoring.faisabilite_technique_level.toLowerCase()}">${result.scoring.faisabilite_technique_level}</span>
+            <div class="scoring-right">
+              <div class="graph-title">Faisabilité × Impact Business</div>
+              <canvas id="scoring-chart" width="300" height="300"></canvas>
             </div>
-            <div class="scoring-row">
-              <span>Urgence</span>
-              <span class="level-badge level-${result.scoring.urgence_level.toLowerCase()}">${result.scoring.urgence_level}</span>
-            </div>
-            <div class="scoring-total-row">
-              <span>Score Total</span>
-              <span class="scoring-total-value" title="${escapeHtml(result.scoring.formula)}">${result.scoring.total}/100</span>
-            </div>
+          </div>
+          
+          <div class="scoring-info">
+            <p style="margin: 12px 0; font-size: 13px; color: #6c757d;">
+              📖 <a href="scoring_guide.html" target="_blank" style="color: #0d6efd; font-weight: 600; text-decoration: underline;">Voir le guide complet de scoring</a> — Grille détaillée avec tous les barèmes
+            </p>
           </div>
         </div>
         
@@ -498,8 +548,8 @@ document.addEventListener('DOMContentLoaded', function() {
               '<span class="phase-simple-name">' + escapeHtml(phase.name) + '</span>' +
               '<span class="phase-simple-duration">' + escapeHtml(phase.duration) + '</span>' +
               '</div>' +
-              '<div class="phase-simple-actions">' + escapeHtml(phase.actions) + '</div>' +
-              '<div class="phase-simple-difficulty">⚡ ' + escapeHtml(phase.main_difficulty) + '</div>' +
+              '<div class="phase-feature">✨ <strong>Feature principale :</strong> ' + escapeHtml(phase.feature_principale) + '</div>' +
+              '<div class="phase-risk">⚠️ <strong>Risque principal :</strong> ' + escapeHtml(phase.risque_principal) + '</div>' +
               '</div>'
             ).join('')}
           </div>
@@ -521,6 +571,100 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     
     output.innerHTML = html;
+    
+    // Dessiner le graphique après insertion du HTML
+    setTimeout(function() {
+      drawScoringChart(result.scoring);
+    }, 100);
+  }
+  
+  function drawScoringChart(scoring) {
+    const canvas = document.getElementById('scoring-chart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Fond
+    ctx.fillStyle = '#f8f9fa';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Grille
+    ctx.strokeStyle = '#dee2e6';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const x = (width / 4) * i;
+      const y = (height / 4) * i;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+    
+    // Axes
+    ctx.strokeStyle = '#495057';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, height);
+    ctx.lineTo(width, height);
+    ctx.lineTo(width, 0);
+    ctx.stroke();
+    
+    // Labels
+    ctx.fillStyle = '#495057';
+    ctx.font = '11px sans-serif';
+    ctx.fillText('Impact Business →', width - 120, height - 5);
+    ctx.save();
+    ctx.translate(10, 100);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Faisabilité →', 0, 0);
+    ctx.restore();
+    
+    // Zones colorées
+    // Zone verte (Quick win): Impact élevé + Faisabilité élevée
+    ctx.fillStyle = 'rgba(25, 135, 84, 0.1)';
+    ctx.fillRect(width * 0.7, 0, width * 0.3, height * 0.3);
+    
+    // Zone jaune (À challenger)
+    ctx.fillStyle = 'rgba(255, 193, 7, 0.1)';
+    ctx.fillRect(width * 0.4, height * 0.3, width * 0.6, height * 0.4);
+    
+    // Zone rouge (Long shot)
+    ctx.fillStyle = 'rgba(220, 53, 69, 0.1)';
+    ctx.fillRect(0, height * 0.7, width * 0.3, height * 0.3);
+    
+    // Calculer position du point (inverser Y car canvas a Y=0 en haut)
+    const impactNorm = scoring.impact_business_score / 40; // 0-1
+    const faisabiliteNorm = scoring.faisabilite_technique_score / 30; // 0-1
+    const x = impactNorm * width;
+    const y = height - (faisabiliteNorm * height); // Inverser Y
+    
+    // Couleur selon urgence
+    let pointColor;
+    if (scoring.urgence_level === 'High') pointColor = '#dc3545';
+    else if (scoring.urgence_level === 'Mid') pointColor = '#ffc107';
+    else pointColor = '#198754';
+    
+    // Dessiner le point
+    ctx.fillStyle = pointColor;
+    ctx.beginPath();
+    ctx.arc(x, y, 12, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // Score au centre du point
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(scoring.total, x, y);
   }
   
   // Auto-save

@@ -543,6 +543,104 @@
       <p><strong>Impact sur le scoring :</strong> Plus il y a de types différents, plus l'automatisation sera complexe (intégrations multiples) → score de faisabilité réduit.</p>
     </div>
 
+    <!-- ============= CALCUL DU GAIN DE TEMPS ============= -->
+    <h2>⏱️ Méthodologie de calcul du gain de temps</h2>
+    
+    <div class="formula-box">
+      <h3 style="margin-top: 0; color: var(--primary);">Formule de base</h3>
+      <div style="text-align: center; font-size: 18px; font-weight: 700; padding: 15px; background: white; border-radius: 8px; margin: 15px 0;">
+        <strong>Gain mensuel (heures) = Fréquence × Nb exécutions × Temps unitaire</strong>
+      </div>
+    </div>
+
+    <h3>📐 Détail des variables</h3>
+    <table class="bareme-table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Variable</th>
+          <th style="width: 35%;">Valeurs</th>
+          <th style="width: 35%;">Coefficient utilisé</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="section-header">
+          <td colspan="3"><strong>Q7 - Fréquence du besoin</strong> (occurrences par mois sur 20 jours ouvrés)</td>
+        </tr>
+        <tr><td>Quotidien</td><td>20 jours</td><td><strong>20</strong></td></tr>
+        <tr><td>Hebdomadaire</td><td>~5 fois/mois</td><td><strong>5</strong></td></tr>
+        <tr><td>Mensuel</td><td>1 fois/mois</td><td><strong>1</strong></td></tr>
+        <tr><td>Occasionnel</td><td>~2 fois/an</td><td><strong>0.5</strong></td></tr>
+        
+        <tr class="section-header">
+          <td colspan="3"><strong>Q8 - Nombre d'exécutions par occurrence</strong> (valeur médiane de la fourchette)</td>
+        </tr>
+        <tr><td>1</td><td>1 exécution</td><td><strong>1</strong></td></tr>
+        <tr><td>2-10</td><td>Médiane</td><td><strong>6</strong></td></tr>
+        <tr><td>11-50</td><td>Médiane</td><td><strong>30</strong></td></tr>
+        <tr><td>51-200</td><td>Médiane</td><td><strong>125</strong></td></tr>
+        <tr><td>200+</td><td>Estimation</td><td><strong>200</strong></td></tr>
+        
+        <tr class="section-header">
+          <td colspan="3"><strong>Q9 - Temps d'exécution unitaire</strong> (en heures, valeur médiane)</td>
+        </tr>
+        <tr><td>&lt; 10 min</td><td>~5 min</td><td><strong>0.1h</strong></td></tr>
+        <tr><td>10-30 min</td><td>~20 min</td><td><strong>0.33h</strong></td></tr>
+        <tr><td>30 min - 1h</td><td>~45 min</td><td><strong>0.75h</strong></td></tr>
+        <tr><td>1-2h</td><td>~1h30</td><td><strong>1.5h</strong></td></tr>
+        <tr><td>&gt; 2h</td><td>~3h</td><td><strong>3h</strong></td></tr>
+      </tbody>
+    </table>
+
+    <h3>💡 Exemples de calcul</h3>
+    
+    <div class="example-box" style="background: #e7f5ff; border-left: 4px solid var(--primary); padding: 15px; margin: 20px 0; border-radius: 5px;">
+      <h4 style="margin-top: 0; color: var(--primary);">Exemple 1 : Saisie quotidienne</h4>
+      <p><strong>Contexte :</strong> Saisie de factures dans SAP, 50 factures/jour, 20 min chacune</p>
+      <ul>
+        <li>Q7 : Quotidien → <strong>20</strong></li>
+        <li>Q8 : 11-50 → <strong>30</strong></li>
+        <li>Q9 : 10-30 min → <strong>0.33h</strong></li>
+      </ul>
+      <p><strong>Calcul :</strong> 20 × 30 × 0.33 = <strong>198h/mois</strong></p>
+      <p><strong>ETP :</strong> 198h / 140h = <strong>1.4 ETP</strong> (base 7h/jour × 20 jours)</p>
+    </div>
+
+    <div class="example-box" style="background: #fff3cd; border-left: 4px solid var(--warning); padding: 15px; margin: 20px 0; border-radius: 5px;">
+      <h4 style="margin-top: 0; color: #856404;">Exemple 2 : Rapprochement mensuel</h4>
+      <p><strong>Contexte :</strong> Clôture comptable mensuelle, 200 écritures, 30 min chacune</p>
+      <ul>
+        <li>Q7 : Mensuel → <strong>1</strong></li>
+        <li>Q8 : 51-200 → <strong>125</strong></li>
+        <li>Q9 : 10-30 min → <strong>0.33h</strong></li>
+      </ul>
+      <p><strong>Calcul :</strong> 1 × 125 × 0.33 = <strong>41h/mois</strong></p>
+      <p><strong>ETP :</strong> 41h / 140h = <strong>0.3 ETP</strong></p>
+    </div>
+
+    <div class="example-box" style="background: #f8d7da; border-left: 4px solid var(--danger); padding: 15px; margin: 20px 0; border-radius: 5px;">
+      <h4 style="margin-top: 0; color: #721c24;">Exemple 3 : Reporting hebdomadaire intensif</h4>
+      <p><strong>Contexte :</strong> Extraction et consolidation de données, ~30 sources, 3h chaque</p>
+      <ul>
+        <li>Q7 : Hebdomadaire → <strong>5</strong></li>
+        <li>Q8 : 11-50 → <strong>30</strong></li>
+        <li>Q9 : &gt; 2h → <strong>3h</strong></li>
+      </ul>
+      <p><strong>Calcul :</strong> 5 × 30 × 3 = <strong>450h/mois</strong></p>
+      <p><strong>ETP :</strong> 450h / 140h = <strong>3.2 ETP</strong></p>
+    </div>
+
+    <h3>❓ Questions fréquentes</h3>
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+      <p><strong>Q : Que faire si plusieurs personnes font la même tâche (Q10 : 50+ personnes) ?</strong></p>
+      <p>R : Le gain de temps calculé représente le temps total économisé pour l'organisation par mois. Si 50 personnes font la tâche, elles se partagent le travail. Le gain reste le même : c'est le temps global libéré.</p>
+      
+      <p style="margin-top: 15px;"><strong>Q : Comment interpréter un gain de 8000h/mois ?</strong></p>
+      <p>R : C'est le temps total cumulé que l'organisation passe sur cette tâche chaque mois. Divisez par 140h (mois plein) pour obtenir l'équivalent ETP : 8000h / 140h = 57 ETP. Cela signifie que cette tâche mobilise l'équivalent de 57 personnes à temps plein.</p>
+      
+      <p style="margin-top: 15px;"><strong>Q : Le calcul est-il toujours exact ?</strong></p>
+      <p>R : Non, c'est une <strong>estimation</strong> basée sur les fourchettes sélectionnées. Pour plus de précision, utilisez les valeurs médianes de chaque fourchette. L'objectif est de donner un ordre de grandeur pour prioriser les use cases.</p>
+    </div>
+
     <hr style="margin: 40px 0; border: none; border-top: 2px solid var(--border);">
 
     <div style="text-align: center; padding: 20px;">

@@ -14,8 +14,8 @@ except Exception:  # pragma: no cover
     OpenAI = None  # will error at runtime if missing
 
 from models import (
-    FormAnalysisResponse, AnalyzeRequest, FormData,
-    ElementCategory, ComplexityLevel, PainPoint, Benefit, Priority, DevTime
+    FormAnalysisResponse, FormAnalysisResponseWithoutScoring, AnalyzeRequest, FormData,
+    ElementCategory, ComplexityLevel, PainPoint, Benefit, Priority, DevTime, Scoring
 )
 
 # Configuration logging
@@ -27,6 +27,136 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o")
+
+
+# ==================== CALCUL DU SCORING ====================
+def calculate_scoring(form_data: FormData, elements_count: int) -> Scoring:
+    """
+    Calcule le scoring de manière déterministe côté backend.
+    Basé sur les réponses du formulaire uniquement.
+    """
+    # IMPACT BUSINESS (0-40 points)
+    impact_score = 0
+    
+    # Q7 - Fréquence du besoin
+    freq_map = {"Quotidien": 10, "Hebdomadaire": 7, "Mensuel": 4, "Occasionnel": 2}
+    impact_score += freq_map.get(form_data.q7, 0)
+    
+    # Q8 - Nombre d'exécutions
+    exec_map = {"1": 1, "2-10": 3, "11-50": 5, "51-200": 7, "200+": 10}
+    impact_score += exec_map.get(form_data.q8, 0)
+    
+    # Q9 - Temps unitaire (avec et sans espaces pour compatibilité formulaire)
+    time_map = {
+        "<10min": 1, "< 10 min": 1,
+        "10-30min": 3, "10-30 min": 3,
+        "30min-1h": 5, "30 min - 1h": 5,
+        "1-2h": 7,
+        ">2h": 10, "> 2h": 10
+    }
+    impact_score += time_map.get(form_data.q9, 0)
+    
+    # Q10 - Nombre de personnes
+    people_map = {"1": 1, "2-5": 3, "6-20": 5, "21-50": 7, "50+": 10}
+    impact_score += people_map.get(form_data.q10, 0)
+    
+    # FAISABILITÉ TECHNIQUE (0-30 points)
+    faisabilite_score = 0
+    
+    # Q17 - Règles claires
+    rules_map = {"Oui": 10, "Partiellement": 6, "Non": 2}
+    faisabilite_score += rules_map.get(form_data.q17, 0)
+    
+    # Nombre de types de sources (calculé par l'IA)
+    if elements_count <= 2:
+        faisabilite_score += 10
+    elif elements_count <= 4:
+        faisabilite_score += 6
+    else:
+        faisabilite_score += 2
+    
+    # Q19 - Complexité organisationnelle
+    complexity_map = {"Simple": 7, "Moyenne": 4, "Complexe": 1}
+    faisabilite_score += complexity_map.get(form_data.q19, 0)
+    
+    # Q15 - Action manuelle requise
+    manual_map = {"Non": 3, "Oui": 0}
+    faisabilite_score += manual_map.get(form_data.q15, 0)
+    
+    # URGENCE (0-30 points)
+    urgence_score = 0
+    try:
+        irritant = int(form_data.q11 or 0)
+        urgence_score = irritant * 6  # 1-5 × 6 = 6-30
+    except ValueError:
+        urgence_score = 0
+    
+    # TOTAL
+    total = impact_score + faisabilite_score + urgence_score
+    
+    # Convertir en base 100 pour l'affichage
+    impact_normalized = round((impact_score / 40) * 100)
+    faisabilite_normalized = round((faisabilite_score / 30) * 100)
+    urgence_normalized = round((urgence_score / 30) * 100)
+    
+    # GAIN TEMPS MENSUEL (heures)
+    # Fréquence = nombre d'occurrences par mois (sur 20 jours ouvrés)
+    freq_factor = {"Quotidien": 20, "Hebdomadaire": 5, "Mensuel": 1, "Occasionnel": 0.5}
+    # Nombre d'exécutions par occurrence (valeur médiane de chaque fourchette)
+    exec_factor = {"1": 1, "2-10": 6, "11-50": 30, "51-200": 125, "200+": 200}
+    # Temps par exécution en heures (avec et sans espaces pour compatibilité)
+    time_factor = {
+        "<10min": 0.1, "< 10 min": 0.1,
+        "10-30min": 0.33, "10-30 min": 0.33,
+        "30min-1h": 0.75, "30 min - 1h": 0.75,
+        "1-2h": 1.5,
+        ">2h": 3, "> 2h": 3
+    }
+    # Nombre de personnes (valeur médiane)
+    people_factor = {"1": 1, "2-5": 3, "6-20": 10, "21-50": 30, "50+": 50}
+    
+    freq_val = freq_factor.get(form_data.q7, 0)
+    exec_val = exec_factor.get(form_data.q8, 0)
+    time_val = time_factor.get(form_data.q9, 0)
+    people_val = people_factor.get(form_data.q10, 1)
+    
+    # FORMULE : (Fréquence × Nb exec × Temps par exec) = heures totales par mois pour l'équipe
+    # Note: On ne multiplie PAS par le nombre de personnes car elles se partagent le travail
+    # Mais on utilise le nombre de personnes pour ajuster le calcul si nécessaire
+    gain_temps = int(freq_val * exec_val * time_val)
+    
+    # Formule lisible
+    formula = (
+        f"Impact[Fréquence({form_data.q7}={freq_map.get(form_data.q7, 0)}) + "
+        f"NbExec({form_data.q8}={exec_map.get(form_data.q8, 0)}) + "
+        f"Temps({form_data.q9}={time_map.get(form_data.q9, 0)}) + "
+        f"Personnes({form_data.q10}={people_map.get(form_data.q10, 0)}) = {impact_score}/40 = {impact_normalized}/100] + "
+        f"Faisabilité[Règles({form_data.q17}={rules_map.get(form_data.q17, 0)}) + "
+        f"TypesSources({elements_count} types) + "
+        f"ComplexitéOrga({form_data.q19}={complexity_map.get(form_data.q19, 0)}) + "
+        f"ActionManuelle({form_data.q15}={manual_map.get(form_data.q15, 0)}) = {faisabilite_score}/30 = {faisabilite_normalized}/100] + "
+        f"Urgence[Irritant({form_data.q11}×6) = {urgence_score}/30 = {urgence_normalized}/100] = "
+        f"Total {total}/100"
+    )
+    
+    justification = (
+        f"Score de {total}/100 basé sur : Impact Business {impact_normalized}/100 "
+        f"(fréquence {form_data.q7}, {form_data.q8} exécutions, {form_data.q9} par exécution, "
+        f"{form_data.q10} personnes), Faisabilité Technique {faisabilite_normalized}/100 "
+        f"({elements_count} types de sources, règles {form_data.q17 or 'non spécifié'}, "
+        f"complexité {form_data.q19 or 'non spécifié'}), Urgence {urgence_normalized}/100 "
+        f"(irritant {form_data.q11}/5)."
+    )
+    
+    return Scoring(
+        impact_business_score=f"{impact_normalized}/100",
+        faisabilite_technique_score=f"{faisabilite_normalized}/100",
+        urgence_score=f"{urgence_normalized}/100",
+        total=total,
+        formula=formula,
+        justification=justification,
+        gain_temps_mensuel_heures=gain_temps
+    )
 
 app = FastAPI(title="CM Form PD – AI Proxy", version="1.0.0")
 
@@ -171,32 +301,7 @@ Outils: """ + (d.q20 or '-') + """
    - pros: 3-5 arguments POUR. Chaque: argument + weight (Faible/Moyen/Fort)
    - cons: 2-4 arguments CONTRE. Chaque: argument + weight (Faible/Moyen/Fort)
 
-6. SCORING sur 100 - FORMULE STANDARDISÉE:
-   
-   IMPACT BUSINESS (0-40) = Q7 + Q8 + Q9 + Q10
-   - Q7 Fréquence: Quotidien=10, Hebdo=7, Mensuel=4, Occasionnel=2
-   - Q8 NbExec: 200+=10, 51-200=7, 11-50=5, 2-10=3, 1=1
-   - Q9 Temps: >2h=10, 1-2h=7, 30min-1h=5, 10-30min=3, <10min=1
-   - Q10 NbPersonnes: 50+=10, 21-50=7, 6-20=5, 2-5=3, 1=1
-   
-   FAISABILITÉ (0-30) = Q17 + count(IA) + Q19 + Q15
-   - Q17 Règles: Oui=10, Partiellement=6, Non=2
-   - count TypesSources (IA): 1-2=10, 3-4=6, 5+=2
-   - Q19 ComplexitéOrga: Simple=7, Moyenne=4, Complexe=1
-   - Q15 ActionManuelle: Non=3, Oui=0
-   
-   URGENCE (0-30) = Q11 × 6
-   
-   GAIN TEMPS MENSUEL = Calcule le gain de temps estimé en heures par mois (20 jours ouvrés)
-   Formule: Q7_fréquence × Q8_nbExec × Q9_temps_moyen × 20 jours
-   Exemple: Quotidien (1/jour) × 50 exec × 20min (0.33h) × 20 jours = 330h/mois
-   
-   Remplis:
-   - formula: "Impact[Fréquence(Quotidien=10) + NbExec(51-200=7) + ...] = XX/40] + Faisabilité[...] = YY/30] + Urgence[...] = ZZ/30] = Total WW/100"
-   - justification: 2-3 phrases
-   - gain_temps_mensuel_heures: Ton calcul en heures par mois
-
-7. DELIVERY:
+6. DELIVERY:
    - dev_time: Temps total
    - phases (2-3): Phases simples
      * name: POC / MVP / Production
@@ -216,8 +321,8 @@ Outils: """ + (d.q20 or '-') + """
                 detail=f"Modèle {MODEL} ne supporte pas Structured Outputs. Utilisez gpt-4o ou gpt-4o-mini"
             )
         
-        # Générer le schéma JSON
-        schema = FormAnalysisResponse.model_json_schema()
+        # Générer le schéma JSON (sans scoring, calculé côté backend)
+        schema = FormAnalysisResponseWithoutScoring.model_json_schema()
         
         logger.info("\n" + "=" * 80)
         logger.info("🤖 APPEL OPENAI")
@@ -297,12 +402,31 @@ Outils: """ + (d.q20 or '-') + """
         logger.info(f"   - Complexité: {result_json.get('elements_sources', {}).get('complexity_level', '?')}")
         logger.info(f"   - Faisabilité: {result_json.get('analysis', {}).get('feasibility_score', 0)}/100")
         logger.info(f"   - Priorité: {result_json.get('analysis', {}).get('priority', '?')}")
-        logger.info(f"   - Scoring: Impact={result_json.get('scoring', {}).get('impact_business_level', '?')}, Faisabilité={result_json.get('scoring', {}).get('faisabilite_technique_level', '?')}, Urgence={result_json.get('scoring', {}).get('urgence_level', '?')}")
-        logger.info(f"   - Score total: {result_json.get('scoring', {}).get('total', '?')}/100")
         logger.info(f"   - Pro/Con: {len(result_json.get('pro_con', {}).get('pros', []))} pros / {len(result_json.get('pro_con', {}).get('cons', []))} cons")
         logger.info(f"   - Temps dev: {result_json.get('delivery', {}).get('dev_time', '?')}")
         logger.info(f"   - Phases: {len(result_json.get('delivery', {}).get('phases', []))}")
         logger.info(f"   - Quick wins: {len(result_json.get('delivery', {}).get('quick_wins', []))}")
+        
+        # CALCUL DU SCORING CÔTÉ BACKEND (déterministe)
+        logger.info("\n🧮 Calcul du scoring côté backend...")
+        elements_count = result_json.get('elements_sources', {}).get('count', 0)
+        calculated_scoring = calculate_scoring(req.form_data, elements_count)
+        
+        # Remplacer le scoring par notre calcul
+        result_json['scoring'] = {
+            'impact_business_score': calculated_scoring.impact_business_score,
+            'faisabilite_technique_score': calculated_scoring.faisabilite_technique_score,
+            'urgence_score': calculated_scoring.urgence_score,
+            'total': calculated_scoring.total,
+            'formula': calculated_scoring.formula,
+            'justification': calculated_scoring.justification,
+            'gain_temps_mensuel_heures': calculated_scoring.gain_temps_mensuel_heures
+        }
+        logger.info(f"   ✅ Scoring calculé: {calculated_scoring.total}/100")
+        logger.info(f"      - Impact Business: {calculated_scoring.impact_business_score}")
+        logger.info(f"      - Faisabilité: {calculated_scoring.faisabilite_technique_score}")
+        logger.info(f"      - Urgence: {calculated_scoring.urgence_score}")
+        logger.info(f"      - Gain temps: {calculated_scoring.gain_temps_mensuel_heures}h/mois")
         
         # Validation Pydantic
         validated_result = FormAnalysisResponse(**result_json)

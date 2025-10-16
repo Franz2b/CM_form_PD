@@ -471,29 +471,20 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="scoring-left">
               <div class="scoring-row">
                 <span>Impact Business</span>
-                <div class="score-with-badge">
-                  <span class="score-number">${Math.round((result.scoring.impact_business_score / 40) * 100)}/100</span>
-                  <span class="level-badge level-${result.scoring.impact_business_level.toLowerCase()}">${result.scoring.impact_business_level}</span>
-                </div>
+                <span class="score-number">${result.scoring.impact_business_score}</span>
               </div>
               <div class="scoring-row">
                 <span>Faisabilité Technique</span>
-                <div class="score-with-badge">
-                  <span class="score-number">${Math.round((result.scoring.faisabilite_technique_score / 30) * 100)}/100</span>
-                  <span class="level-badge level-${result.scoring.faisabilite_technique_level.toLowerCase()}">${result.scoring.faisabilite_technique_level}</span>
-                </div>
+                <span class="score-number">${result.scoring.faisabilite_technique_score}</span>
               </div>
               <div class="scoring-row">
                 <span>Urgence</span>
-                <div class="score-with-badge">
-                  <span class="score-number">${Math.round((result.scoring.urgence_score / 30) * 100)}/100</span>
-                  <span class="level-badge level-${result.scoring.urgence_level.toLowerCase()}">${result.scoring.urgence_level}</span>
-                </div>
+                <span class="score-number">${result.scoring.urgence_score}</span>
               </div>
               <div class="gain-temps-box">
                 <strong>⏱️ Gain de temps estimé :</strong> ${result.scoring.gain_temps_mensuel_heures}h/mois
                 <div style="margin-top: 4px; font-size: 13px; color: #6c757d;">
-                  = ${(result.scoring.gain_temps_mensuel_heures / 100).toFixed(1)} ETP <span style="font-size: 11px;">(base 5h/jour × 20 jours)</span>
+                  = ${(result.scoring.gain_temps_mensuel_heures / 140).toFixed(1)} ETP <span style="font-size: 11px;">(base 7h/jour × 20 jours)</span>
                 </div>
               </div>
             </div>
@@ -586,9 +577,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const width = canvas.width;
     const height = canvas.height;
     
+    // Parser les scores ratio (format "XX/100")
+    const parseRatio = (ratioStr) => {
+      const parts = ratioStr.split('/');
+      return { numerator: parseInt(parts[0]), denominator: parseInt(parts[1]) };
+    };
+    
+    const impact = parseRatio(scoring.impact_business_score);
+    const faisabilite = parseRatio(scoring.faisabilite_technique_score);
+    const urgence = parseRatio(scoring.urgence_score);
+    
     // Fond
     ctx.fillStyle = '#f8f9fa';
     ctx.fillRect(0, 0, width, height);
+    
+    // Cadrans colorés
+    // Haut droite (forte faisabilité, fort impact): VERT
+    ctx.fillStyle = 'rgba(25, 135, 84, 0.15)';
+    ctx.fillRect(width / 2, 0, width / 2, height / 2);
+    
+    // Haut gauche (forte impact, faible faisabilité): JAUNE
+    ctx.fillStyle = 'rgba(255, 193, 7, 0.15)';
+    ctx.fillRect(0, 0, width / 2, height / 2);
+    
+    // Bas droite (forte faisabilité, faible impact): JAUNE
+    ctx.fillStyle = 'rgba(255, 193, 7, 0.15)';
+    ctx.fillRect(width / 2, height / 2, width / 2, height / 2);
+    
+    // Bas gauche (faible faisabilité, faible impact): ROUGE
+    ctx.fillStyle = 'rgba(220, 53, 69, 0.15)';
+    ctx.fillRect(0, height / 2, width / 2, height / 2);
     
     // Grille
     ctx.strokeStyle = '#dee2e6';
@@ -615,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.lineTo(width, 0);
     ctx.stroke();
     
-    // Labels
+    // Labels des axes
     ctx.fillStyle = '#495057';
     ctx.font = '11px sans-serif';
     ctx.fillText('Impact Business →', width - 120, height - 5);
@@ -625,30 +643,19 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.fillText('Faisabilité →', 0, 0);
     ctx.restore();
     
-    // Zones colorées
-    // Zone verte (Quick win): Impact élevé + Faisabilité élevée
-    ctx.fillStyle = 'rgba(25, 135, 84, 0.1)';
-    ctx.fillRect(width * 0.7, 0, width * 0.3, height * 0.3);
-    
-    // Zone jaune (À challenger)
-    ctx.fillStyle = 'rgba(255, 193, 7, 0.1)';
-    ctx.fillRect(width * 0.4, height * 0.3, width * 0.6, height * 0.4);
-    
-    // Zone rouge (Long shot)
-    ctx.fillStyle = 'rgba(220, 53, 69, 0.1)';
-    ctx.fillRect(0, height * 0.7, width * 0.3, height * 0.3);
-    
     // Calculer position du point (inverser Y car canvas a Y=0 en haut)
-    const impactNorm = scoring.impact_business_score / 40; // 0-1
-    const faisabiliteNorm = scoring.faisabilite_technique_score / 30; // 0-1
+    // Tout est en base 100 maintenant
+    const impactNorm = impact.numerator / 100; // 0-1
+    const faisabiliteNorm = faisabilite.numerator / 100; // 0-1
+    const urgenceNorm = urgence.numerator / 100; // 0-1
     const x = impactNorm * width;
     const y = height - (faisabiliteNorm * height); // Inverser Y
     
     // Couleur selon urgence
     let pointColor;
-    if (scoring.urgence_level === 'High') pointColor = '#dc3545';
-    else if (scoring.urgence_level === 'Mid') pointColor = '#ffc107';
-    else pointColor = '#198754';
+    if (urgenceNorm >= 0.7) pointColor = '#dc3545'; // Rouge pour urgence élevée
+    else if (urgenceNorm >= 0.4) pointColor = '#ffc107'; // Jaune pour urgence moyenne
+    else pointColor = '#198754'; // Vert pour urgence faible
     
     // Dessiner le point
     ctx.fillStyle = pointColor;
@@ -659,12 +666,18 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.lineWidth = 3;
     ctx.stroke();
     
-    // Score au centre du point
+    // Score total au centre du point
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 10px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(scoring.total, x, y);
+    
+    // Légende pour l'urgence (en bas à l'intérieur du graphique)
+    ctx.font = '9px sans-serif';
+    ctx.fillStyle = '#6c757d';
+    ctx.textAlign = 'center';
+    ctx.fillText('Couleur du point = urgence', width / 2, height - 8);
   }
   
   // Auto-save

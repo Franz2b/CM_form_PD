@@ -75,7 +75,7 @@ uvicorn main:app --host 0.0.0.0 --port 5050 --reload
 
 ### Frontend
 1. Remplir le formulaire
-2. Aller sur "👀 5. Synthèse"
+2. Aller sur "👀 5. SumUp"
 3. Cliquer sur "🤖 Analyser le formulaire"
 4. Résultats affichés en temps réel
 

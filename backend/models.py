@@ -161,12 +161,9 @@ class Scoring(BaseModel):
     """Scoring détaillé sur 100"""
     model_config = {"extra": "forbid"}
     
-    impact_business_level: str
-    impact_business_score: int = Field(ge=0, le=40)
-    faisabilite_technique_level: str
-    faisabilite_technique_score: int = Field(ge=0, le=30)
-    urgence_level: str
-    urgence_score: int = Field(ge=0, le=30)
+    impact_business_score: str  # Format: "17/40"
+    faisabilite_technique_score: str  # Format: "27/30"
+    urgence_score: str  # Format: "24/30"
     total: int = Field(ge=0, le=100)
     formula: str
     justification: str
@@ -185,9 +182,24 @@ class Analysis(BaseModel):
 
 # ==================== SCHÉMA PRINCIPAL ====================
 
+class FormAnalysisResponseWithoutScoring(BaseModel):
+    """
+    Réponse structurée de l'analyse du formulaire SANS le scoring.
+    Le scoring sera calculé côté backend Python.
+    """
+    model_config = {"extra": "forbid"}
+    
+    user_story: UserStory
+    execution_schema: ExecutionSchema
+    elements_sources: ElementsSources
+    analysis: Analysis
+    pro_con: ProCon
+    delivery: Delivery
+
+
 class FormAnalysisResponse(BaseModel):
     """
-    Réponse structurée de l'analyse du formulaire.
+    Réponse structurée complète de l'analyse du formulaire.
     STRUCTURE FIXE - Toujours les mêmes champs.
     """
     model_config = {"extra": "forbid"}

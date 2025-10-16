@@ -36,15 +36,12 @@
     ]
   },
   "scoring": {
-    "impact_business_level": "High",
-    "impact_business_score": 33,
-    "faisabilite_technique_level": "Mid",
-    "faisabilite_technique_score": 20,
-    "urgence_level": "High",
-    "urgence_score": 24,
-    "total": 77,
-    "formula": "Impact[Fréquence(Quotidien=10) + NbExec(51-200=7) + Temps(10-30min=3) + Personnes(2-5=3) = 23/40] + Faisabilité[Règles(Oui=10) + TypesSources(3 types=6) + ComplexitéOrga(Moyenne=4) + ActionManuelle(Oui=0) = 20/30] + Urgence[Irritant(4×6) = 24/30] = Total 67/100",
-    "justification": "Score correct (67/100) grâce à un impact business important (quotidien, 50 exec, 5 personnes), une faisabilité technique moyenne (3 types de données, règles claires) et une urgence élevée (irritant 4/5).",
+    "impact_business_score": "58/100",
+    "faisabilite_technique_score": "67/100",
+    "urgence_score": "80/100",
+    "total": 67,
+    "formula": "Impact[Fréquence(Quotidien=10) + NbExec(51-200=7) + Temps(10-30min=3) + Personnes(2-5=3) = 23/40 = 58/100] + Faisabilité[Règles(Oui=10) + TypesSources(3 types=6) + ComplexitéOrga(Moyenne=4) + ActionManuelle(Oui=0) = 20/30 = 67/100] + Urgence[Irritant(4×6) = 24/30 = 80/100] = Total 67/100",
+    "justification": "Score de 67/100 basé sur : Impact Business 58/100 (fréquence Quotidien, 51-200 exécutions, 10-30min par exécution, 2-5 personnes), Faisabilité Technique 67/100 (3 types de sources, règles Oui, complexité Moyenne), Urgence 80/100 (irritant 4/5).",
     "gain_temps_mensuel_heures": 333
   },
   "delivery": {

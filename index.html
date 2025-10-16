@@ -24,14 +24,13 @@
             <li><button type="button" class="wizard-step" onclick="window.goToStep(2)" data-step="2">💡 2. Besoin</button></li>
             <li><button type="button" class="wizard-step" onclick="window.goToStep(3)" data-step="3">📊 3. Volumétrie</button></li>
             <li><button type="button" class="wizard-step" onclick="window.goToStep(4)" data-step="4">🔧 4. Nature</button></li>
-            <li><button type="button" class="wizard-step" onclick="window.goToStep(5)" data-step="5">👀 5. Synthèse</button></li>
-            <li><button type="button" class="wizard-step" onclick="window.goToStep(6)" data-step="6">🤖 6. IA</button></li>
+            <li><button type="button" class="wizard-step" onclick="window.goToStep(5)" data-step="5">👀 5. SumUp</button></li>
+            <li><button type="button" class="wizard-step" onclick="window.goToStep(6)" data-step="6">🤖 6. Analyse IA</button></li>
           </ol>
           <div class="progress"><div id="progress-fill" class="progress-fill" style="width: 20%"></div></div>
         </nav>
 
         <section class="step-section is-active" data-step="1" aria-labelledby="bloc-1">
-          <h2 id="bloc-1">1. Persona</h2>
           <p class="hint">Informations sur l'utilisateur final qui bénéficiera de l'automatisation.</p>
           
           <div class="form-group">
@@ -71,11 +70,9 @@
         </section>
 
         <section class="step-section" data-step="2" aria-labelledby="bloc-2">
-          <h2 id="bloc-2">2. Contexte & Besoin</h2>
-          <p class="hint">Décrivez le contexte et le besoin utilisateur. L'IA analysera automatiquement les pain points et bénéfices.</p>
-
           <div class="form-group">
             <label for="q5">Q5. Brief utilisateur - Contexte et besoin</label>
+            <p class="hint">Décrivez le contexte et le besoin utilisateur. L'IA analysera automatiquement les pain points et bénéfices.</p>  
             <p class="hint">Soyez concret et donnez des exemples !</p>
             <textarea id="q5" name="q5" rows="6" placeholder="Décrivez :&#10;• Quelle est la situation actuelle ?&#10;• Quel est le problème rencontré ?&#10;• Quel serait le résultat souhaité après automatisation ?&#10;&#10;Exemple : 'Actuellement, je reçois 50 factures par jour par e-mail. Je dois manuellement extraire les données (montant, fournisseur, date) et les saisir dans notre ERP. C'est long, répétitif et source d'erreurs. Je voudrais que ces données soient automatiquement extraites et intégrées dans l'ERP.'" required></textarea>
           </div>
@@ -88,8 +85,6 @@
         </section>
 
         <section class="step-section" data-step="3" aria-labelledby="bloc-3">
-          <h2 id="bloc-3">3. Volumétrie & Impact</h2>
-
           <fieldset class="form-group">
             <legend>Q7. Fréquence du besoin</legend>
             <p class="hint">À quelle fréquence le besoin se présente-t-il ?</p>
@@ -162,8 +157,6 @@
         </section>
 
         <section class="step-section" data-step="4" aria-labelledby="bloc-4">
-          <h2 id="bloc-4">4. Nature de la tâche</h2>
-
           <div class="form-group">
             <label for="q14">Q14. Quels sont les éléments sources de la tâche ?</label>
             <p class="hint">Quels types de données, documents ou informations sont utilisés/traités dans cette tâche ? (peuvent nécessiter numérisation ou saisie)</p>
@@ -220,33 +213,7 @@
           </div>
         </section>
 
-        <section class="conformite meta-section" hidden>
-          <h3>Conformité au cahier des charges</h3>
-          <ul>
-            <li>🧭 Structure standardisée → 4 blocs clairs, identiques pour tous.</li>
-            <li>📊 Critères comparables → Échelles, fourchettes, cases à cocher normalisées.</li>
-            <li>🧮 Scoring possible → Temps, irritants, volumétrie, impact structurés.</li>
-            <li>👤 Accessible terrain → Formulation métier + « Pourquoi ».</li>
-            <li>⏳ Rapide à remplir → 21 questions max, majoritairement choix multiples.</li>
-            <li>🪫 Mesure des irritants → Q12 + Q13 dédiées.</li>
-            <li>🚀 Actionnable delivery → Parties prenantes + volumétrie + coûts + impact.</li>
-            <li>🧭 Décision rapide → Go / No Go priorisable dès réception.</li>
-          </ul>
-        </section>
-
-        <section class="retours meta-section" hidden>
-          <h3>Intégration des retours Edith</h3>
-          <ul>
-            <li>✅ Impact direct / indirect → Q16</li>
-            <li>✅ Inversion Q14/Q15 pour logique impact → gains</li>
-            <li>✅ Coûts directs / indirects → Q17</li>
-            <li>✅ Formulaire orienté diagnostic terrain → pas stratégique lourd</li>
-            <li>✅ Précision sur bénéfices et portée → Q14 enrichie</li>
-          </ul>
-        </section>
-
         <section class="step-section" data-step="5" aria-labelledby="bloc-5">
-          <h2 id="bloc-5">👀 Synthèse</h2>
 
           <article class="panel recap">
             <div id="recap-content" class="recap-content">
@@ -256,8 +223,6 @@
         </section>
 
         <section class="step-section" data-step="6" aria-labelledby="bloc-6">
-          <h2 id="bloc-6">🤖 Analyse IA</h2>
-
           <article class="panel">
             <div class="ai-header" style="justify-content: flex-end;">
               <div class="ai-controls">

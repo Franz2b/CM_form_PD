@@ -1,51 +1,106 @@
 # Formulaire Diagnostic Process
 
-Formulaire en ligne, autonome (HTML/CSS/JS), pour qualifier un processus et faciliter la priorisation des cas d'usage.
+Formulaire en ligne pour qualifier un processus et faciliter la priorisation des cas d'usage avec scoring automatique, synthèses IA et chatbot d'assistance.
 
-## Utilisation
+## 🚀 Lancer l'application
 
-1. Ouvrez le fichier `index.html` dans votre navigateur (double-clic).
-2. Remplissez le formulaire (autosauvegarde activée – vous pouvez revenir plus tard).
-3. Cliquez sur « Exporter en JSON » pour télécharger les réponses.
-4. « Réinitialiser » efface le formulaire et les données locales.
+### 1️⃣ Terminal 1 — Backend IA
+```bash
+cd /Users/francoisvivarelli/Documents/Dev/CM/CM_form_PD/backend
+pip install -r requirements.txt  # Première fois seulement
+uvicorn main:app --host 0.0.0.0 --port 5050
+```
 
-## Structure
+### 2️⃣ Terminal 2 — Ouvrir l'app
+```bash
+open /Users/francoisvivarelli/Documents/Dev/CM/CM_form_PD/index.html
+```
 
-- `index.html` – Structure du formulaire (21 questions, 4 blocs)
-- `styles.css` – Styles modernes, accessibles, responsive
-- `script.js` – Autosauvegarde (`localStorage`), export JSON, réinitialisation
-  et navigation par chapitres, scoring automatique, récap, IA (synthèse & delivery)
+### 3️⃣ Dans l'interface web
+- Cliquez sur **⚙️ Paramètres IA**
+- URL backend : `http://localhost:5050/ai`
+- Cliquez **Sauvegarder**
 
-## Personnalisation
+---
 
-- Lien Coach IA: dans `script.js`, modifiez l'adresse e‑mail `coach-ia@exemple.com`.
-- Thème: adaptez les variables CSS dans `styles.css` (`:root`).
+## 🔑 Configuration clé OpenAI (première fois)
 
-## Données
+La clé API OpenAI doit être dans `/backend/.env` :
 
-Les données sont stockées localement dans votre navigateur (`localStorage`) sous la clé `cm_form_pd_v1`. Aucun envoi réseau n'est effectué.
+```bash
+cd /Users/francoisvivarelli/Documents/Dev/CM/CM_form_PD/backend
+echo "OPENAI_API_KEY=sk-votre-clé-ici" > .env
+```
 
-## IA (optionnelle)
+✅ Le fichier `.env` est protégé par `.gitignore` (jamais versionné)
 
-Deux options:
+---
 
-1. Recommandé — Backend FastAPI (sécurisé)
-   - Prérequis: Python 3.10+
-   - Installation:
-     ```bash
-     cd /Users/francoisvivarelli/Documents/Dev/CM/CM_form_PD/backend
-     python3 -m venv .venv && source .venv/bin/activate
-     pip install -r requirements.txt
-     # Option A: .env → copiez ENV_EXAMPLE.txt en .env et remplissez OPENAI_API_KEY
-     # Option B: variable d'env
-     export OPENAI_API_KEY="VOTRE_CLE_OPENAI"
-     uvicorn main:app --host 0.0.0.0 --port 5050
-     ```
-   - Dans la page (⚙️ Paramètres IA), mettez `http://localhost:5050/ai`.
+## 💡 Comment ça fonctionne
 
-2. Non recommandé — Clé OpenAI dans le navigateur
-   - Renseignez la clé dans le champ Clé OpenAI. Risque d’exposition dans les DevTools.
+**Frontend** (`index.html` + `script.js` + `styles.css`)
+- Formulaire 21 questions → scoring automatique → récapitulatif
+- Autosave dans `localStorage` (aucune donnée envoyée au serveur)
+- Export JSON pour archivage
 
-Le formulaire n’envoie rien sans votre action sur « Générer ». Les prompts incluent un récap des réponses et des scores.
+**Backend IA** (`backend/main.py`)
+- Proxy FastAPI sécurisé vers OpenAI
+- Génère synthèse + recommandations delivery
+- Clé API reste côté serveur (jamais exposée au navigateur)
+
+**Flux :** Remplir → Auto-save → Générer synthèse IA → Exporter JSON
+
+---
+
+## 🆕 Nouvelles fonctionnalités
+
+### ✨ Améliorations récentes
+
+1. **Q3 - Exemples d'étapes** : Exemples concrets pour aider à la saisie des étapes clés
+2. **Q4 - Enjeux simplifiés** : Réduction de 7 à 5 catégories (regroupement Conformité/Risques, Satisfaction GO/clients)
+3. **Q13 - Faisabilité technique** : Recentrage sur les critères techniques d'automatisation (API, règles claires, données structurées)
+4. **Q14 - Impacts clarifiés** : Regroupement Qualité/Fiabilité en une seule option
+5. **Q15 - Gains économiques** : Distinction claire entre gain de temps ET gain de coût (champs séparés)
+6. **Q16 - Impact direct** : Clarification de la notion d'impact direct (première personne impactée)
+7. **Q20 - Département** : Liste déroulante avec départements prédéfinis
+8. **User Story éditable** : Section dédiée avec génération automatique et champs de validation
+9. **Chatbot IA** : Widget flottant en bas à droite pour poser des questions pendant le remplissage
+10. **Scoring amélioré** : Séparation claire entre opportunité métier (Q4) et faisabilité technique (Q13)
+
+### 🤖 Assistance IA
+
+- **Chatbot contextuel** : Cliquez sur le bouton 💬 en bas à droite pour poser vos questions
+- **Génération User Story** : Bouton dédié dans la section "Scoring & Synthèse"
+- **Synthèse intelligente** : Analyse automatique avec recommandations Go/No-Go
+- **Delivery automatique** : Génération de roadmap et staffing
+
+---
+
+## 📁 Structure
+
+```
+/
+├── index.html       # Formulaire (21 questions, 4 blocs)
+├── styles.css       # Styles modernes, responsive
+├── script.js        # Autosave, scoring, navigation, IA
+└── backend/
+    ├── main.py          # API FastAPI (proxy OpenAI)
+    ├── requirements.txt # Dépendances Python
+    └── .env            # Clé OpenAI (à créer, ignoré par git)
+```
+
+---
+
+## 🛠️ Personnalisation
+
+- **Lien Coach IA** : dans `script.js`, modifiez `coach-ia@exemple.com`
+- **Thème** : adaptez les variables CSS dans `styles.css` (`:root`)
+- **Modèle OpenAI** : dans `backend/.env`, ajoutez `OPENAI_MODEL=gpt-4o`
+
+---
+
+## 📊 Données
+
+Les données sont stockées localement (`localStorage`, clé `cm_form_pd_v1`). Aucun envoi réseau sans action explicite sur "Générer".
 
 

@@ -473,21 +473,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span>Impact Business</span>
                 <div class="score-with-badge">
                   <span class="score-number">${Math.round((result.scoring.impact_business_score / 40) * 100)}/100</span>
-                  <span class="level-badge level-${result.scoring.impact_business_level.toLowerCase()}">${result.scoring.impact_business_level}</span>
                 </div>
               </div>
               <div class="scoring-row">
                 <span>Faisabilité Technique</span>
                 <div class="score-with-badge">
                   <span class="score-number">${Math.round((result.scoring.faisabilite_technique_score / 30) * 100)}/100</span>
-                  <span class="level-badge level-${result.scoring.faisabilite_technique_level.toLowerCase()}">${result.scoring.faisabilite_technique_level}</span>
                 </div>
               </div>
               <div class="scoring-row">
                 <span>Urgence</span>
                 <div class="score-with-badge">
                   <span class="score-number">${Math.round((result.scoring.urgence_score / 30) * 100)}/100</span>
-                  <span class="level-badge level-${result.scoring.urgence_level.toLowerCase()}">${result.scoring.urgence_level}</span>
                 </div>
               </div>
               <div class="gain-temps-box">
@@ -646,9 +643,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Couleur selon urgence
     let pointColor;
-    if (scoring.urgence_level === 'High') pointColor = '#dc3545';
+    if (scoring.urgence_level === 'High') pointColor = '#198754';
     else if (scoring.urgence_level === 'Mid') pointColor = '#ffc107';
-    else pointColor = '#198754';
+    else pointColor = '#dc3545';
     
     // Dessiner le point
     ctx.fillStyle = pointColor;

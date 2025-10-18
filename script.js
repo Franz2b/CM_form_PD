@@ -284,14 +284,17 @@ function escapeHtml(s) {
         <div class="recap-label">Q5. Brief utilisateur</div>
         <div class="recap-value">${escapeHtml(d.q5 || '—').replace(/\n/g, '<br>')}</div>
       </div>
+      <div id="ia-user-story-placeholder"></div>
+      <br>
       <div class="recap-item">
         <div class="recap-label">Q6. Exécution actuelle de la tâche</div>
         <div class="recap-value">${escapeHtml(d.q6 || '—').replace(/\n/g, '<br>')}</div>
       </div>
+      <div id="ia-execution-schema-placeholder"></div>
     </div>
 
     <div class="recap-section">
-      <h3>📊 Volumétrie & Impact</h3>
+      <h3>📊 Impact</h3>
       <div class="recap-item">
         <div class="recap-label">Q7. Fréquence du besoin</div>
         <div class="recap-value">${escapeHtml(d.q7 || '—')}</div>
@@ -323,11 +326,12 @@ function escapeHtml(s) {
     </div>
 
     <div class="recap-section">
-      <h3>🔧 Nature de la tâche</h3>
+      <h3>🔧 Faisabilité</h3>
       <div class="recap-item">
         <div class="recap-label">Q14. Éléments sources de la tâche</div>
         <div class="recap-value">${escapeHtml(d.q14 || '—').replace(/\n/g, '<br>')}</div>
       </div>
+      <div id="ia-elements-sources-placeholder"></div>
       <div class="recap-item">
         <div class="recap-label">Q15. Action manuelle ?</div>
         <div class="recap-value">${escapeHtml(d.q15 || '—')}</div>
@@ -395,6 +399,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const result = await response.json();
         currentAnalysisResult = { form_data: formData, ai_analysis: result };
+        
+        // Afficher dans SumUp (page 5) et Analyse IA (page 6)
+        displaySumUpIA(result);
         displayAnalysisResult(result);
         
         // Sauvegarder automatiquement
@@ -432,39 +439,78 @@ document.addEventListener('DOMContentLoaded', function() {
       }
   }
   
+  // Affichage dans SumUp (page 5) - Intégré dans le récapitulatif
+  function displaySumUpIA(result) {
+    // Afficher le titre du projet en haut
+    const sumupSection = document.getElementById('ai-sumup-section');
+    const sumupOutput = document.getElementById('ai-sumup-output');
+    if (sumupOutput && sumupSection) {
+      sumupOutput.innerHTML = `
+        <div class="project-name-section">
+          <h3 class="project-name">🎯 ${escapeHtml(result.user_story.project_name)}</h3>
+        </div>
+      `;
+      sumupSection.style.display = 'block';
+    }
+    
+    // 1. User Story après Q5
+    const userStoryPlaceholder = document.getElementById('ia-user-story-placeholder');
+    if (userStoryPlaceholder) {
+      userStoryPlaceholder.innerHTML = `
+        <div class="recap-item" style="background: #e7f5ff; border-left: 4px solid #0d6efd; margin-top: 10px;">
+          <div class="recap-label" style="color: #0d6efd; font-weight: 600;">🤖 User Story (générée par IA)</div>
+          <div class="recap-value">
+            <div class="user-story-content">${result.user_story.html}</div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // 2. Schéma d'exécution après Q6
+    const schemaPlaceholder = document.getElementById('ia-execution-schema-placeholder');
+    if (schemaPlaceholder) {
+      schemaPlaceholder.innerHTML = `
+        <div class="recap-item" style="background: #e7f5ff; border-left: 4px solid #0d6efd; margin-top: 10px;">
+          <div class="recap-label" style="color: #0d6efd; font-weight: 600;">🤖 Schéma d'exécution (généré par IA)</div>
+          <div class="recap-value">
+            <pre class="ascii-diagram" style="background: white; padding: 15px; border-radius: 8px; font-size: 13px;">${escapeHtml(result.execution_schema.ascii_diagram)}</pre>
+          </div>
+        </div>
+      `;
+    }
+    
+    // 3. Éléments sources analysés après Q14
+    const elementsPlaceholder = document.getElementById('ia-elements-sources-placeholder');
+    if (elementsPlaceholder) {
+      elementsPlaceholder.innerHTML = `
+        <div class="recap-item" style="background: #e7f5ff; border-left: 4px solid #0d6efd; margin-top: 10px;">
+          <div class="recap-label" style="color: #0d6efd; font-weight: 600;">🤖 Éléments sources analysés (par IA)</div>
+          <div class="recap-value">
+            <div class="elements-grid">
+              ${result.elements_sources.types.map(el => 
+                '<div class="element-badge"><span class="badge-cat">' + escapeHtml(el.category) + '</span> ' + escapeHtml(el.description) + '</div>'
+              ).join('')}
+            </div>
+            <p style="margin-top: 8px;">
+              <strong>Nombre de types :</strong> ${result.elements_sources.count}
+              <span style="margin-left: 15px;"><strong>Catégorie :</strong> 
+                <span style="padding: 2px 8px; background: #fff; border-radius: 4px; font-weight: 600;">${escapeHtml(result.elements_sources.complexity_level)}</span>
+              </span>
+              <a href="scoring_guide.html#categories-sources" target="_blank" style="margin-left: 10px; font-size: 12px; color: #0d6efd;">ℹ️ Voir classification</a>
+            </p>
+          </div>
+        </div>
+      `;
+    }
+  }
+  
+  // Affichage dans Analyse IA (page 6)
   function displayAnalysisResult(result) {
     const output = aiAnalysisOutput;
     if (!output) return;
     
     const html = `
       <div class="analysis-result">
-        <div class="project-name-section">
-          <h3 class="project-name">🎯 ${escapeHtml(result.user_story.project_name)}</h3>
-        </div>
-        
-        <div class="analysis-section">
-          <h4>📝 User Story</h4>
-          <div class="user-story-box">
-            <div class="user-story-content">${result.user_story.html}</div>
-            <p class="word-count">${result.user_story.word_count} mots</p>
-          </div>
-        </div>
-        
-        <div class="analysis-section">
-          <h4>📊 Schéma d'exécution</h4>
-          <pre class="ascii-diagram">${escapeHtml(result.execution_schema.ascii_diagram)}</pre>
-        </div>
-        
-        <div class="analysis-section">
-          <h4>🔧 Éléments sources analysés</h4>
-          <div class="elements-grid">
-            ${result.elements_sources.types.map(el => 
-              '<div class="element-badge"><span class="badge-cat">' + escapeHtml(el.category) + '</span> ' + escapeHtml(el.description) + '</div>'
-            ).join('')}
-          </div>
-          <p><strong>Types de sources :</strong> ${result.elements_sources.count} | <strong>Complexité :</strong> <span class="complexity-${result.elements_sources.complexity_level.toLowerCase()}">${escapeHtml(result.elements_sources.complexity_level)}</span></p>
-        </div>
-        
         <div class="analysis-section">
           <h4>🎯 Scoring</h4>
           <div class="scoring-grid">

@@ -528,19 +528,72 @@
     </table>
 
     <!-- ============= VARIABLES IA ============= -->
-    <h2>🤖 Variables calculées par l'IA</h2>
+    <h2 id="categories-sources">🤖 Variables calculées par l'IA</h2>
     
     <div class="ai-variable">
-      <h3 style="margin-top: 0;">count - Nombre de types de sources</h3>
-      <p><strong>Source :</strong> Analyse automatique de la réponse Q12 (Éléments sources de la tâche)</p>
+      <h3 style="margin-top: 0;">1. Nombre de types de sources (count)</h3>
+      <p><strong>Source :</strong> Analyse automatique de la réponse Q14 (Éléments sources de la tâche)</p>
       <p><strong>Logique :</strong> L'IA identifie et catégorise chaque type de source mentionné (Excel, PDF, Email, SAP...)</p>
+      <p><strong>Barème (max 5 points) :</strong></p>
+      <ul>
+        <li>1-2 types → <strong>5 points</strong> (peu d'intégrations)</li>
+        <li>3-4 types → <strong>3 points</strong> (intégrations multiples)</li>
+        <li>5+ types → <strong>1 point</strong> (très nombreuses intégrations)</li>
+      </ul>
       <p><strong>Exemple :</strong></p>
       <ul>
-        <li>"Excel GL + Excel OSB + SAP" → <strong>2 types</strong> (Excel, ERP_CRM) → 10 points</li>
-        <li>"PDF + Excel + SAP + Email" → <strong>4 types</strong> → 6 points</li>
-        <li>"Excel + PDF + SAP + Email + Images + Papier" → <strong>6 types</strong> → 2 points</li>
+        <li>"Excel GL + Excel OSB + SAP" → <strong>2 types</strong> (Excel, ERP_CRM) → 5 points</li>
+        <li>"PDF + Excel + SAP + Email" → <strong>4 types</strong> → 3 points</li>
+        <li>"Excel + PDF + SAP + Email + Images + Papier" → <strong>6 types</strong> → 1 point</li>
       </ul>
-      <p><strong>Impact sur le scoring :</strong> Plus il y a de types différents, plus l'automatisation sera complexe (intégrations multiples) → score de faisabilité réduit.</p>
+    </div>
+
+    <div class="ai-variable" style="margin-top: 30px;">
+      <h3 style="margin-top: 0;">2. Catégorie de complexité des sources (complexity_level)</h3>
+      <p><strong>Source :</strong> Analyse globale des types de sources identifiés</p>
+      <p><strong>Logique :</strong> L'IA détermine la catégorie de complexité dominante parmi toutes les sources</p>
+      
+      <h4 style="color: var(--success); margin-top: 20px;">📗 Standard (5 points)</h4>
+      <p style="margin-left: 20px;">Sources structurées et faciles à intégrer. Complexité faible.</p>
+      <ul style="margin-left: 20px;">
+        <li>Bases de données (SQL, NoSQL)</li>
+        <li>Fichiers plats (CSV, XLSX, JSON simples)</li>
+        <li>Exports structurés d'ERP/CRM</li>
+      </ul>
+      
+      <h4 style="color: var(--warning); margin-top: 20px;">📙 Intermédiaire (3 points)</h4>
+      <p style="margin-left: 20px;">Sources semi-structurées demandant un peu de traitement. Complexité moyenne.</p>
+      <ul style="margin-left: 20px;">
+        <li>APIs REST/SOAP</li>
+        <li>Flux de données (streaming, Kafka)</li>
+        <li>XML, logs structurés</li>
+        <li>Webhooks, notifications</li>
+      </ul>
+      
+      <h4 style="color: #fd7e14; margin-top: 20px;">📕 Complexe (1 point)</h4>
+      <p style="margin-left: 20px;">Sources non structurées nécessitant une extraction avancée. Complexité élevée.</p>
+      <ul style="margin-left: 20px;">
+        <li>PDF (extraction de données)</li>
+        <li>Texte libre, documents Word</li>
+        <li>Images, photos (OCR nécessaire)</li>
+        <li>Audio, vidéo (reconnaissance vocale)</li>
+      </ul>
+      
+      <h4 style="color: var(--danger); margin-top: 20px;">📘 Non standardisée (0 point)</h4>
+      <p style="margin-left: 20px;">Sources humaines ou imprévisibles, très hétérogènes. Complexité très élevée.</p>
+      <ul style="margin-left: 20px;">
+        <li>Emails libres (contenu non structuré)</li>
+        <li>Formulaires ouverts (réponses textuelles)</li>
+        <li>Conversations orales, réunions</li>
+        <li>Documents papier manuscrits</li>
+      </ul>
+      
+      <p style="margin-top: 20px;"><strong>⚡ Impact sur le scoring de faisabilité :</strong></p>
+      <p style="margin-left: 20px;">La catégorie de complexité affecte directement la faisabilité technique. Plus les sources sont complexes ou non standardisées, plus l'automatisation sera difficile et coûteuse à mettre en place.</p>
+      
+      <div style="background: #fff3cd; border-left: 4px solid var(--warning); padding: 15px; margin-top: 20px; border-radius: 5px;">
+        <p style="margin: 0;"><strong>💡 Note :</strong> Le score de faisabilité combine le <strong>nombre de types</strong> (diversité des intégrations) ET la <strong>catégorie de complexité</strong> (difficulté d'extraction). Un projet avec 2 sources complexes (PDF OCR) peut être moins faisable qu'un projet avec 5 sources standard (CSV).</p>
+      </div>
     </div>
 
     <!-- ============= CALCUL DU GAIN DE TEMPS ============= -->

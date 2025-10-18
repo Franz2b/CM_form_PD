@@ -25,10 +25,11 @@ class ElementCategory(str, Enum):
 
 
 class ComplexityLevel(str, Enum):
-    """Niveau de complexité des données - LISTE FERMÉE"""
-    STRUCTURE = "Structuré"
-    SEMI_STRUCTURE = "Semi-structuré"
-    NON_STRUCTURE = "Non-structuré"
+    """Catégorie de sources - LISTE FERMÉE"""
+    STANDARD = "Standard"
+    INTERMEDIAIRE = "Intermédiaire"
+    COMPLEXE = "Complexe"
+    NON_STANDARDISEE = "Non standardisée"
 
 
 class PainPoint(str, Enum):

@@ -22,8 +22,8 @@
           <ol class="wizard-steps" role="tablist">
             <li><button type="button" class="wizard-step" onclick="window.goToStep(1)" data-step="1">👤 1. Persona</button></li>
             <li><button type="button" class="wizard-step" onclick="window.goToStep(2)" data-step="2">💡 2. Besoin</button></li>
-            <li><button type="button" class="wizard-step" onclick="window.goToStep(3)" data-step="3">📊 3. Volumétrie</button></li>
-            <li><button type="button" class="wizard-step" onclick="window.goToStep(4)" data-step="4">🔧 4. Nature</button></li>
+            <li><button type="button" class="wizard-step" onclick="window.goToStep(3)" data-step="3">📊 3. Impact</button></li>
+            <li><button type="button" class="wizard-step" onclick="window.goToStep(4)" data-step="4">🔧 4. Faisabilité</button></li>
             <li><button type="button" class="wizard-step" onclick="window.goToStep(5)" data-step="5">👀 5. SumUp</button></li>
             <li><button type="button" class="wizard-step" onclick="window.goToStep(6)" data-step="6">🤖 6. Analyse IA</button></li>
           </ol>
@@ -31,8 +31,9 @@
         </nav>
 
         <section class="step-section is-active" data-step="1" aria-labelledby="bloc-1">
-          <p class="hint">Informations sur l'utilisateur final qui bénéficiera de l'automatisation.</p>
-          
+          <h2 style="color: #0d6efd; font-size: 18px; margin-bottom: 8px;">Qui est concerné ?</h2>
+          <p class="hint">Identifiez la personne qui réalise actuellement cette tâche et qui bénéficiera de l'automatisation.</p>
+          <br><hr><br>
           <div class="form-group">
             <label for="q1">Q1. Nom de l'utilisateur final</label>
             <input type="text" id="q1" name="q1" placeholder="Ex: Dupont" required />
@@ -70,6 +71,9 @@
         </section>
 
         <section class="step-section" data-step="2" aria-labelledby="bloc-2">
+          <h2 style="color: #0d6efd; font-size: 18px; margin-bottom: 8px;">Quel est le problème ?</h2>
+          <p class="hint">Décrivez la situation actuelle et ce qui pose problème dans l'exécution de cette tâche.</p>
+          <br><hr><br>
           <div class="form-group">
             <label for="q5">Q5. Brief utilisateur - Contexte et besoin</label>
             <p class="hint">Décrivez le contexte et le besoin utilisateur. L'IA analysera automatiquement les pain points et bénéfices.</p>  
@@ -85,6 +89,9 @@
         </section>
 
         <section class="step-section" data-step="3" aria-labelledby="bloc-3">
+          <h2 style="color: #0d6efd; font-size: 18px; margin-bottom: 8px;">Quel est l'impact ?</h2>
+          <p class="hint">Évaluez l'ampleur du problème : combien de fois, combien de temps, combien de personnes concernées ?</p>
+          <br><hr><br>
           <fieldset class="form-group">
             <legend>Q7. Fréquence du besoin</legend>
             <p class="hint">À quelle fréquence le besoin se présente-t-il ?</p>
@@ -157,6 +164,9 @@
         </section>
 
         <section class="step-section" data-step="4" aria-labelledby="bloc-4">
+          <h2 style="color: #0d6efd; font-size: 18px; margin-bottom: 8px;">Est-ce automatisable ?</h2>
+          <p class="hint">Décrivez les données et outils utilisés pour évaluer la complexité technique de l'automatisation.</p>
+          <br><hr><br>
           <div class="form-group">
             <label for="q14">Q14. Quels sont les éléments sources de la tâche ?</label>
             <p class="hint">Quels types de données, documents ou informations sont utilisés/traités dans cette tâche ? (peuvent nécessiter numérisation ou saisie)</p>
@@ -215,6 +225,13 @@
 
         <section class="step-section" data-step="5" aria-labelledby="bloc-5">
 
+          <article class="panel" id="ai-sumup-section" style="display: none; margin-bottom: 20px;">
+            <h3 style="color: #0d6efd; margin-bottom: 20px;">🤖 Analyse IA du use case</h3>
+            <div id="ai-sumup-output" class="ai-output">
+              <!-- Titre, User Story, Schéma, Éléments sources -->
+            </div>
+          </article>
+
           <article class="panel recap">
             <div id="recap-content" class="recap-content">
               <!-- Rendu dynamique -->
@@ -224,12 +241,11 @@
 
         <section class="step-section" data-step="6" aria-labelledby="bloc-6">
           <article class="panel">
-            <div class="ai-header" style="justify-content: flex-end;">
-              <div class="ai-controls">
-                <button type="button" id="analyze-btn" class="secondary">Analyser le formulaire</button>
-              </div>
+            <div id="ai-analysis-output" class="ai-output">
+              <p class="hint" style="text-align: center; padding: 40px 20px; color: #6c757d;">
+                👈 Cliquez sur "Lancer l'analyse IA" en bas pour générer l'analyse complète
+              </p>
             </div>
-            <div id="ai-analysis-output" class="ai-output"></div>
             <div id="save-status" class="save-status" style="display:none;"></div>
           </article>
 
@@ -242,6 +258,14 @@
         </div>
 
       </form>
+
+      <!-- Bouton IA fixe en bas -->
+      <div style="position: sticky; bottom: 0; background: linear-gradient(to top, rgba(255,255,255,1) 80%, rgba(255,255,255,0)); padding: 20px 0; margin-top: 30px; border-top: 2px solid #e7f1ff; text-align: center;">
+        <button type="button" id="analyze-btn" class="primary" style="font-size: 16px; padding: 12px 30px; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);">
+          🤖 Lancer l'analyse IA
+        </button>
+        <p style="font-size: 12px; color: #6c757d; margin-top: 8px;">Génère la user story, le scoring et le plan de delivery</p>
+      </div>
     </main>
 
     <footer class="app-footer">

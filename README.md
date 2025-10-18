@@ -72,7 +72,7 @@ echo "OPENAI_API_KEY=sk-votre-clé-ici" > .env
 - Exécution actuelle de la tâche (texte libre)
 - *L'IA analysera automatiquement les pain points et bénéfices*
 
-**📊 3. Volumétrie & Impact (7 questions)**
+**📊 3. Impact (7 questions)**
 - Fréquence du besoin
 - Nombre d'exécutions par occurrence
 - Temps d'exécution unitaire  
@@ -80,7 +80,7 @@ echo "OPENAI_API_KEY=sk-votre-clé-ici" > .env
 - Niveau d'irritant/urgence (+ pourquoi irritant/urgent)
 - *Permet de calculer l'impact total*
 
-**🔧 4. Nature de la tâche (5 questions)**
+**🔧 4. Faisabilité (5 questions)**
 - Éléments sources (Excel, PDF, papier...)
 - Action manuelle ? (+ exemple)
 - Règles simples ? (+ exemple complexité)

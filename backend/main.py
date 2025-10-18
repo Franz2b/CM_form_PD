@@ -30,10 +30,10 @@ MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o")
 
 
 # ==================== CALCUL DU SCORING ====================
-def calculate_scoring(form_data: FormData, elements_count: int) -> Scoring:
+def calculate_scoring(form_data: FormData, elements_count: int, complexity_category: str = "Standard") -> Scoring:
     """
     Calcule le scoring de manière déterministe côté backend.
-    Basé sur les réponses du formulaire uniquement.
+    Basé sur les réponses du formulaire + analyse IA (nombre et catégorie des sources).
     """
     # IMPACT BUSINESS (0-40 points)
     impact_score = 0
@@ -67,13 +67,24 @@ def calculate_scoring(form_data: FormData, elements_count: int) -> Scoring:
     rules_map = {"Oui": 10, "Partiellement": 6, "Non": 2}
     faisabilite_score += rules_map.get(form_data.q17, 0)
     
-    # Nombre de types de sources (calculé par l'IA)
+    # Nombre de types de sources + Catégorie de complexité (calculés par l'IA)
+    # Points basés sur le nombre de types (max 5 points)
     if elements_count <= 2:
-        faisabilite_score += 10
+        count_points = 5
     elif elements_count <= 4:
-        faisabilite_score += 6
+        count_points = 3
     else:
-        faisabilite_score += 2
+        count_points = 1
+    faisabilite_score += count_points
+    
+    # Points basés sur la catégorie de complexité (max 5 points)
+    complexity_category_map = {
+        "Standard": 5,           # Facile à intégrer
+        "Intermédiaire": 3,      # Traitement modéré
+        "Complexe": 1,           # Extraction avancée
+        "Non standardisée": 0    # Très difficile
+    }
+    faisabilite_score += complexity_category_map.get(complexity_category, 0)
     
     # Q19 - Complexité organisationnelle
     complexity_map = {"Simple": 7, "Moyenne": 4, "Complexe": 1}
@@ -126,13 +137,15 @@ def calculate_scoring(form_data: FormData, elements_count: int) -> Scoring:
     gain_temps = int(freq_val * exec_val * time_val)
     
     # Formule lisible
+    complexity_points = complexity_category_map.get(complexity_category, 0)
     formula = (
         f"Impact[Fréquence({form_data.q7}={freq_map.get(form_data.q7, 0)}) + "
         f"NbExec({form_data.q8}={exec_map.get(form_data.q8, 0)}) + "
         f"Temps({form_data.q9}={time_map.get(form_data.q9, 0)}) + "
         f"Personnes({form_data.q10}={people_map.get(form_data.q10, 0)}) = {impact_score}/40 = {impact_normalized}/100] + "
         f"Faisabilité[Règles({form_data.q17}={rules_map.get(form_data.q17, 0)}) + "
-        f"TypesSources({elements_count} types) + "
+        f"NbTypesSources({elements_count}={count_points}pts) + "
+        f"CatégorieSources({complexity_category}={complexity_points}pts) + "
         f"ComplexitéOrga({form_data.q19}={complexity_map.get(form_data.q19, 0)}) + "
         f"ActionManuelle({form_data.q15}={manual_map.get(form_data.q15, 0)}) = {faisabilite_score}/30 = {faisabilite_normalized}/100] + "
         f"Urgence[Irritant({form_data.q11}×6) = {urgence_score}/30 = {urgence_normalized}/100] = "
@@ -143,8 +156,8 @@ def calculate_scoring(form_data: FormData, elements_count: int) -> Scoring:
         f"Score de {total}/100 basé sur : Impact Business {impact_normalized}/100 "
         f"(fréquence {form_data.q7}, {form_data.q8} exécutions, {form_data.q9} par exécution, "
         f"{form_data.q10} personnes), Faisabilité Technique {faisabilite_normalized}/100 "
-        f"({elements_count} types de sources, règles {form_data.q17 or 'non spécifié'}, "
-        f"complexité {form_data.q19 or 'non spécifié'}), Urgence {urgence_normalized}/100 "
+        f"({elements_count} types de sources catégorie {complexity_category}, règles {form_data.q17 or 'non spécifié'}, "
+        f"complexité orga {form_data.q19 or 'non spécifié'}), Urgence {urgence_normalized}/100 "
         f"(irritant {form_data.q11}/5)."
     )
     
@@ -291,9 +304,13 @@ Outils: """ + (d.q20 or '-') + """
 2. EXECUTION SCHEMA: Diagramme ASCII vertical UNIQUEMENT (pas de liste étapes)
 
 3. ELEMENTS SOURCES (Q14):
-   - types: Catégorise STRICTEMENT
+   - types: Catégorise STRICTEMENT chaque source
    - count: Nombre de TYPES UNIQUES (Excel GL + Excel OSB = 1 seul type)
-   - complexity_level: Structuré/Semi-structuré/Non-structuré
+   - complexity_level: Catégorise la complexité globale selon :
+     * Standard: Sources structurées et faciles (BD, CSV, XLSX, JSON)
+     * Intermédiaire: Semi-structurées, traitement modéré (APIs, XML, logs)
+     * Complexe: Non structurées, extraction avancée (PDF, texte libre, images OCR, audio)
+     * Non standardisée: Humaines/imprévisibles (emails libres, conversations orales)
 
 4. ANALYSIS: Pain points, bénéfices, score faisabilité, priorité
 
@@ -410,7 +427,8 @@ Outils: """ + (d.q20 or '-') + """
         # CALCUL DU SCORING CÔTÉ BACKEND (déterministe)
         logger.info("\n🧮 Calcul du scoring côté backend...")
         elements_count = result_json.get('elements_sources', {}).get('count', 0)
-        calculated_scoring = calculate_scoring(req.form_data, elements_count)
+        complexity_category = result_json.get('elements_sources', {}).get('complexity_level', 'Standard')
+        calculated_scoring = calculate_scoring(req.form_data, elements_count, complexity_category)
         
         # Remplacer le scoring par notre calcul
         result_json['scoring'] = {

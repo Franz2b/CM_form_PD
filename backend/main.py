@@ -76,24 +76,13 @@ def calculate_scoring(form_data: FormData, elements_count: int, total_sources: i
     except (ValueError, TypeError):
         people_val = 1
     
-    # CALCUL IMPACT BUSINESS : Temps total mensuel (heures)
+    # CALCUL DU GAIN DE TEMPS MENSUEL (heures) - Pour information uniquement (ETP)
     # Temps par personne
     temps_par_personne = freq_val * exec_val * time_val
     # Gain total = temps par personne × nombre de personnes
     temps_mensuel_total = temps_par_personne * people_val
     
-    # Normaliser sur 40 points (basé sur le gain total)
-    # Barème : 0-200h=0-10pts, 200-1000h=10-20pts, 1000-4000h=20-30pts, 4000h+=30-40pts
-    if temps_mensuel_total <= 200:
-        impact_score = int(temps_mensuel_total / 20)  # 0-10 pts
-    elif temps_mensuel_total <= 1000:
-        impact_score = 10 + int((temps_mensuel_total - 200) / 80)  # 10-20 pts
-    elif temps_mensuel_total <= 4000:
-        impact_score = 20 + int((temps_mensuel_total - 1000) / 300)  # 20-30 pts
-    else:
-        impact_score = 30 + min(10, int((temps_mensuel_total - 4000) / 1000))  # 30-40 pts
-    
-    impact_score = min(40, max(0, impact_score))
+    # Note : Le gain de temps n'est pas scoré, on utilise les ETP pour comparer l'impact
     
     # FAISABILITÉ TECHNIQUE (0-30 points)
     faisabilite_score = 0
@@ -140,11 +129,7 @@ def calculate_scoring(form_data: FormData, elements_count: int, total_sources: i
     except ValueError:
         urgence_score = 0
     
-    # TOTAL
-    total = impact_score + faisabilite_score + urgence_score
-    
     # Convertir en base 100 pour l'affichage
-    impact_normalized = round((impact_score / 40) * 100)
     faisabilite_normalized = round((faisabilite_score / 30) * 100)
     urgence_normalized = round((urgence_score / 30) * 100)
     
@@ -155,33 +140,26 @@ def calculate_scoring(form_data: FormData, elements_count: int, total_sources: i
     # Formule lisible
     complexity_points = complexity_category_map.get(complexity_category, 0)
     formula = (
-        f"Impact[TempsMensuel({temps_mensuel_total:.1f}h) = Fréquence({freq_val}j/mois) × "
-        f"NbExec({exec_val}) × Temps({time_val:.2f}h) × "
-        f"NbPersonnes({people_val}) = {impact_score}/40 = {impact_normalized}/100] + "
         f"Faisabilité[Règles({form_data.q17}={rules_map.get(form_data.q17, 0)}) + "
         f"NbSources({total_sources}={sources_points}pts) + "
         f"CatégorieSources({complexity_category}={complexity_points}pts) + "
         f"ComplexitéOrga({form_data.q19}={complexity_map.get(form_data.q19, 0)}) + "
-        f"ActionManuelle({form_data.q15}={manual_map.get(form_data.q15, 0)}) = {faisabilite_score}/30 = {faisabilite_normalized}/100] + "
-        f"Urgence[Irritant({form_data.q11}×6) = {urgence_score}/30 = {urgence_normalized}/100] = "
-        f"Total {total}/100"
+        f"ActionManuelle({form_data.q15}={manual_map.get(form_data.q15, 0)}) = {faisabilite_score}/30 = {faisabilite_normalized}/100] | "
+        f"Urgence[Irritant({form_data.q11}×6) = {urgence_score}/30 = {urgence_normalized}/100]"
     )
     
     justification = (
-        f"Score de {total}/100 basé sur : Impact Business {impact_normalized}/100 "
-        f"(temps mensuel total {temps_mensuel_total:.1f}h = fréquence {freq_val}/mois × {exec_val} exécutions × "
-        f"{form_data.q9} × {people_val} personnes), "
         f"Faisabilité Technique {faisabilite_normalized}/100 "
         f"({total_sources} sources ({elements_count} types) catégorie {complexity_category}, règles {form_data.q17 or 'non spécifié'}, "
-        f"complexité orga {form_data.q19 or 'non spécifié'}), Urgence {urgence_normalized}/100 "
-        f"(irritant {form_data.q11}/5)."
+        f"complexité orga {form_data.q19 or 'non spécifié'}), "
+        f"Urgence {urgence_normalized}/100 (irritant {form_data.q11}/5). "
+        f"Gain de temps mensuel : {temps_mensuel_total:.1f}h = {freq_val}j/mois × {exec_val} exécutions × "
+        f"{form_data.q9} × {people_val} personnes = {temps_mensuel_total/140:.1f} ETP."
     )
     
     return Scoring(
-        impact_business_score=f"{impact_normalized}/100",
         faisabilite_technique_score=f"{faisabilite_normalized}/100",
         urgence_score=f"{urgence_normalized}/100",
-        total=total,
         formula=formula,
         justification=justification,
         gain_temps_mensuel_heures=gain_temps
@@ -313,9 +291,10 @@ Outils: """ + (d.q20 or '-') + """
    - project_name: Génère un NOM DE PROJET court et impactant (3-6 mots max)
      Exemple: "Automatisation Saisie Factures SAP" ou "Robot Rapprochement Comptable"
    - html: User story HTML (max 100 mots) AVEC CONTEXTE
-     Format: <p><strong>En tant que</strong> [rôle + contexte département/volumétrie],</p>
+     Format: <p><strong>En tant que</strong> [Prénom Nom], [Fonction/Rôle] au sein du [Département],</p>
              <p><strong>j'ai besoin de</strong> [besoin détaillé]</p>
              <p><strong>afin de</strong> [bénéfice concret et mesurable].</p>
+     IMPORTANT: Ne PAS mentionner la volumétrie dans le "En tant que", seulement le persona
 
 2. EXECUTION SCHEMA: Diagramme ASCII vertical UNIQUEMENT (pas de liste étapes)
 
@@ -450,16 +429,13 @@ Outils: """ + (d.q20 or '-') + """
         
         # Remplacer le scoring par notre calcul
         result_json['scoring'] = {
-            'impact_business_score': calculated_scoring.impact_business_score,
             'faisabilite_technique_score': calculated_scoring.faisabilite_technique_score,
             'urgence_score': calculated_scoring.urgence_score,
-            'total': calculated_scoring.total,
             'formula': calculated_scoring.formula,
             'justification': calculated_scoring.justification,
             'gain_temps_mensuel_heures': calculated_scoring.gain_temps_mensuel_heures
         }
-        logger.info(f"   ✅ Scoring calculé: {calculated_scoring.total}/100")
-        logger.info(f"      - Impact Business: {calculated_scoring.impact_business_score}")
+        logger.info(f"   ✅ Scoring calculé:")
         logger.info(f"      - Faisabilité: {calculated_scoring.faisabilite_technique_score}")
         logger.info(f"      - Urgence: {calculated_scoring.urgence_score}")
         logger.info(f"      - Gain temps: {calculated_scoring.gain_temps_mensuel_heures}h/mois")
@@ -547,6 +523,7 @@ async def save_use_case(req: SaveRequest):
         }
         
         # Construire JSON complet
+        etp_value = round(req.ai_analysis.scoring.gain_temps_mensuel_heures / 140, 1)
         complete_data = {
             "metadata": {
                 "saved_at": now.isoformat(),
@@ -554,7 +531,9 @@ async def save_use_case(req: SaveRequest):
                 "persona": f"{d.q1} {d.q2}",
                 "role": d.q3,
                 "department": d.q4,
-                "score": req.ai_analysis.scoring.total,
+                "etp": etp_value,
+                "faisabilite": req.ai_analysis.scoring.faisabilite_technique_score,
+                "urgence": req.ai_analysis.scoring.urgence_score,
                 "priority": req.ai_analysis.analysis.priority
             },
             "form_data": form_data_readable,
@@ -567,7 +546,7 @@ async def save_use_case(req: SaveRequest):
         
         logger.info(f"💾 Use case sauvegardé: {filename}")
         logger.info(f"   Persona: {req.form_data.q1} {req.form_data.q2}")
-        logger.info(f"   Score: {req.ai_analysis.scoring.total}/100")
+        logger.info(f"   Faisabilité: {req.ai_analysis.scoring.faisabilite_technique_score}, Urgence: {req.ai_analysis.scoring.urgence_score}")
         logger.info(f"   Fichier: {filepath}")
         
         return {

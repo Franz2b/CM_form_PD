@@ -514,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <span style="margin-left: 15px;"><strong>Catégorie :</strong> 
                 <span style="padding: 2px 8px; background: #fff; border-radius: 4px; font-weight: 600;">${escapeHtml(result.elements_sources.complexity_level)}</span>
               </span>
-              <a href="scoring_guide.html#categories-sources" target="_blank" style="margin-left: 10px; font-size: 12px; color: #0d6efd;">ℹ️ Voir classification</a>
+              <a href="doc.html#categories-sources" target="_blank" style="margin-left: 10px; font-size: 12px; color: #0d6efd;">ℹ️ Voir classification</a>
             </p>
           </div>
         </div>
@@ -562,9 +562,9 @@ document.addEventListener('DOMContentLoaded', function() {
           <h4>🎯 Scoring</h4>
           <div class="scoring-grid">
             <div class="scoring-left">
-              <div class="scoring-row">
-                <span>Impact Business</span>
-                <span class="score-number" style="font-size: 20px; font-weight: 700; color: #0d6efd;">${etp} ETP/mois</span>
+              <div class="scoring-row" style="padding: 12px; background: #e7f1ff; border-radius: 6px; margin-bottom: 8px;">
+                <span style="font-weight: 600; font-size: 15px;">Gain Business</span>
+                <span style="font-size: 20px; font-weight: 700; color: #0d6efd;">${etp} ETP/mois</span>
               </div>
               <div class="scoring-row">
                 <span>Faisabilité Technique</span>
@@ -574,6 +574,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span>Urgence</span>
                 <span class="score-number">${result.scoring.urgence_score}</span>
               </div>
+              
+              <div class="cout-horaire-box" style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-top: 12px; border: 1px solid #ffc107;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                  <strong>💰 Coût horaire du persona :</strong>
+                  <input type="number" id="cout-horaire-input" min="0" step="1" placeholder="Ex: 50" 
+                         style="width: 100px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+                  <span style="font-size: 14px; color: #495057;">€/h</span>
+                </div>
+                <div id="cout-annuel-display" style="font-size: 13px; color: #856404; display: none;">
+                  <strong>📊 Économie annuelle estimée :</strong> <span id="cout-annuel-value" style="font-weight: 700; color: #28a745; font-size: 16px;"></span>
+                </div>
+              </div>
+              
               <div class="gain-temps-box" style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-top: 12px;">
                 <strong>⏱️ Gain de temps estimé :</strong> ${tempsMensuelTotal}h/mois = <strong>${etp} ETP</strong> <span style="font-size: 11px; color: #6c757d;">(base 7h/jour × 20 jours)</span>
                 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #dee2e6; font-size: 12px; color: #495057; font-family: 'Courier New', monospace;">
@@ -581,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   <div style="margin-left: 10px;">
                     <div>1️⃣ Temps par personne = Fréquence × Nb exec × Temps unitaire</div>
                     <div style="margin-left: 20px; color: #6c757d;">
-                      = ${freqVal} × ${execVal} × ${timeVal.toFixed(2)}h = <strong>${tempsParPersonne.toFixed(1)}h/mois</strong>
+                      = ${freqVal}j/mois × ${execVal} × ${timeVal.toFixed(2)}h = <strong>${tempsParPersonne.toFixed(1)}h/mois</strong>
                     </div>
                     <div style="margin-top: 6px;">2️⃣ Gain total mensuel = Temps par personne × Nb personnes</div>
                     <div style="margin-left: 20px; color: #0d6efd; font-weight: 600;">
@@ -597,18 +610,6 @@ document.addEventListener('DOMContentLoaded', function() {
                   </div>
                 </div>
               </div>
-              
-              <div class="cout-horaire-box" style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-top: 12px; border: 1px solid #ffc107;">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                  <strong>💰 Coût horaire du persona :</strong>
-                  <input type="number" id="cout-horaire-input" min="0" step="1" placeholder="Ex: 50" 
-                         style="width: 100px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
-                  <span style="font-size: 14px; color: #495057;">€/h</span>
-                </div>
-                <div id="cout-annuel-display" style="font-size: 13px; color: #856404; display: none;">
-                  <strong>📊 Économie annuelle estimée :</strong> <span id="cout-annuel-value" style="font-weight: 700; color: #28a745; font-size: 16px;"></span>
-                </div>
-              </div>
             </div>
             <div class="scoring-right">
               <div class="graph-title">Faisabilité × ETP</div>
@@ -621,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
           
           <div class="scoring-info">
             <p style="margin: 12px 0; font-size: 13px; color: #6c757d;">
-              📖 <a href="scoring_guide.html" target="_blank" style="color: #0d6efd; font-weight: 600; text-decoration: underline;">Voir le guide complet de scoring</a> — Grille détaillée avec tous les barèmes
+              📖 <a href="doc.html" target="_blank" style="color: #0d6efd; font-weight: 600; text-decoration: underline;">Voir la documentation complète</a> — Calculs, barèmes et exemples détaillés
             </p>
           </div>
         </div>

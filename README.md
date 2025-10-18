@@ -67,7 +67,7 @@ Le backend doit être accessible sur `http://localhost:5050`
 - **Faisabilité Technique** (30 pts) : Basé sur les règles métier, nombre de sources, complexité organisationnelle
 - **Urgence** (30 pts) : Niveau d'irritant ressenti
 
-📖 [**Guide complet du scoring**](scoring_guide.html) — Documentation détaillée avec exemples
+📖 [**Documentation complète**](doc.html) — Calculs, barèmes et exemples détaillés
 
 ## 🏗️ Architecture
 
@@ -87,7 +87,7 @@ Le backend doit être accessible sur `http://localhost:5050`
 ```
 /
 ├── index.html              # Interface principale
-├── scoring_guide.html      # Documentation scoring
+├── doc.html                # Documentation complète
 ├── script.js              # Logique frontend
 ├── styles.css             # Styles
 ├── media/
@@ -167,7 +167,7 @@ pytest  # Si des tests sont ajoutés
 
 ## 📚 Documentation
 
-- [**Guide complet du scoring**](scoring_guide.html) : Barèmes détaillés et exemples
+- [**Documentation complète**](doc.html) : Calculs, barèmes et exemples détaillés
 - [**Exemple de use case**](backend/use_cases/example_use_case.json) : Structure JSON complète
 
 ## 🤝 Contribution
@@ -185,7 +185,7 @@ Propriétaire - Tous droits réservés
 ## 🆘 Support
 
 Pour toute question ou problème :
-- Consulter la [documentation du scoring](scoring_guide.html)
+- Consulter la [documentation complète](doc.html)
 - Vérifier que le backend est bien lancé sur le port 5050
 - Vérifier que la clé OpenAI est correctement configurée dans `.env`
 

@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Documentation - Process Designer</title>
+  <style>
+    :root {
+      --primary: #0d6efd;
+      --success: #198754;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --border: #dee2e6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #ffffff;
+      color: #212529;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: var(--primary);
+      margin-top: 40px;
+      margin-bottom: 20px;
+      padding-left: 10px;
+      border-left: 4px solid var(--primary);
+    }
+    h3 {
+      color: #495057;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+    h4 {
+      color: #495057;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .formula-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 25px 0;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .formula-box .title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      opacity: 0.95;
+    }
+    .formula-box .formula {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    thead {
+      background: var(--primary);
+      color: white;
+    }
+    th {
+      padding: 14px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr:hover {
+      background: #f8f9fa;
+    }
+    .highlight-row {
+      background: #e7f1ff !important;
+      font-weight: 600;
+    }
+    .info-box {
+      background: #e7f1ff;
+      border-left: 4px solid var(--primary);
+      padding: 16px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+    .warning-box {
+      background: #fff3cd;
+      border-left: 4px solid var(--warning);
+      padding: 16px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+    .success-box {
+      background: #d1e7dd;
+      border-left: 4px solid var(--success);
+      padding: 16px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+    .example {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border: 1px solid var(--border);
+    }
+    .example h4 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+    .back-link {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .back-link:hover {
+      background: #0b5ed7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge-high { background: #dc3545; color: white; }
+    .badge-medium { background: #ffc107; color: #000; }
+    .badge-low { background: #198754; color: white; }
+    code {
+      background: #f8f9fa;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #d63384;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📖 Documentation - Analyse des Use Cases</h1>
+    
+    <div class="info-box">
+      <p><strong>🎯 Objectif :</strong> Cette documentation explique comment prioriser objectivement les projets d'automatisation en évaluant leur <strong>faisabilité technique</strong>, leur <strong>urgence</strong> et leur <strong>impact (ETP)</strong>.</p>
+      <p style="margin: 8px 0 0 0;"><strong>📊 Indicateurs :</strong></p>
+      <ul style="margin: 8px 0 0 20px;">
+        <li><strong>Faisabilité Technique :</strong> 0-100 (facilité d'automatisation)</li>
+        <li><strong>Urgence :</strong> 0-100 (niveau d'irritant ressenti)</li>
+        <li><strong>ETP :</strong> Équivalent Temps Plein (impact métier mensuel)</li>
+      </ul>
+    </div>
+
+    <!-- ========================================
+         PRINCIPE DE PRIORISATION
+    ======================================== -->
+    
+    <h2>🧮 Principe de Priorisation</h2>
+    
+    <div class="warning-box">
+      <p><strong>💡 Approche :</strong> Les projets sont évalués selon <strong>deux dimensions indépendantes</strong> :</p>
+      <ul style="margin: 8px 0 0 20px;">
+        <li><strong>Faisabilité × Urgence :</strong> Détermine <strong>QUAND</strong> faire le projet (difficulté vs besoin)</li>
+        <li><strong>ETP (Équivalent Temps Plein) :</strong> Indique <strong>COMBIEN</strong> on va gagner (impact métier)</li>
+      </ul>
+      <p style="margin-top: 12px;"><strong>🎯 Projets idéaux :</strong> Faisabilité élevée (>70) + Urgence élevée (>70) + ETP élevé (>2) = Quick Win à fort impact !</p>
+    </div>
+
+    <!-- ========================================
+         1. MESURE DE L'IMPACT : ETP
+    ======================================== -->
+    
+    <h2>📊 1. Mesure de l'Impact : Équivalent Temps Plein (ETP)</h2>
+    
+    <p><strong>Principe :</strong> L'impact métier est mesuré par le <strong>gain de temps total</strong> converti en ETP, mais <strong>n'est pas scoré</strong>. Il est utilisé comme axe du graphique pour comparer visuellement les projets.</p>
+    
+    <h3>📐 Formule de calcul du gain de temps mensuel</h3>
+    
+    <div class="formula-box">
+      <div class="title">Gain mensuel (heures)</div>
+      <div class="formula">Nb jours/mois × Nb exécutions × Temps unitaire × Nb personnes</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Question</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Nb jours/mois</strong></td>
+          <td>Q7</td>
+          <td>Nombre de jours par mois où la tâche est exécutée<br><em>Ex: Quotidien = 20, Hebdomadaire = 5, Mensuel = 1</em></td>
+        </tr>
+        <tr>
+          <td><strong>Nb exécutions</strong></td>
+          <td>Q8</td>
+          <td>Nombre de fois que la tâche est exécutée chaque jour où elle se présente<br><em>Ex: 50 factures par jour</em></td>
+        </tr>
+        <tr>
+          <td><strong>Temps unitaire</strong></td>
+          <td>Q9</td>
+          <td>Durée d'une exécution (en heures)<br><em>Ex: 1j 2h 30min = 26.5h</em></td>
+        </tr>
+        <tr>
+          <td><strong>Nb personnes</strong></td>
+          <td>Q10</td>
+          <td>Nombre de personnes effectuant cette tâche<br><em>Ex: 3 personnes dans l'équipe</em></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>💡 Conversion en ETP</h3>
+    
+    <div class="formula-box">
+      <div class="title">ETP = Gain mensuel (heures) / 140h</div>
+      <div class="formula">Base : 7h/jour × 20 jours ouvrés = 140h/mois</div>
+    </div>
+    
+    <p>L'ETP représente l'équivalent en personnes à temps plein que mobilise cette tâche chaque mois.</p>
+
+    <div class="example">
+      <h4>📊 Exemple de calcul</h4>
+      <p><strong>Contexte :</strong></p>
+      <ul>
+        <li>Q7 : 20 jours/mois (quotidien)</li>
+        <li>Q8 : 50 exécutions par jour</li>
+        <li>Q9 : 20 minutes par exécution (0.33h)</li>
+        <li>Q10 : 1 personne</li>
+      </ul>
+      <p><strong>Calcul du gain mensuel :</strong></p>
+      <p style="margin-left: 20px;">20j × 50 exec × 0.33h × 1 personne = <strong>330h/mois</strong></p>
+      <p><strong>Conversion en ETP :</strong></p>
+      <p style="margin-left: 20px;">330h / 140h = <strong>2.4 ETP</strong></p>
+      <p style="margin-top: 10px; padding: 10px; background: #e7f1ff; border-radius: 6px;">
+        💡 Cette tâche mobilise l'équivalent de <strong>2.4 personnes à temps plein</strong> chaque mois.
+      </p>
+    </div>
+
+    <!-- ========================================
+         2. FAISABILITÉ TECHNIQUE (30 pts)
+    ======================================== -->
+    
+    <h2>🔧 2. Faisabilité Technique (30 points max)</h2>
+    
+    <p><strong>Principe :</strong> Évalue la <strong>facilité d'automatisation</strong> du use case. Basé sur l'IA pour Q14 (Sources) et l'évaluation manuelle des règles (Q17) et de la complexité organisationnelle (Q19).</p>
+
+    <h3>🎯 Barème de scoring</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 40%;">Critère</th>
+          <th style="width: 30%;">Question</th>
+          <th style="width: 15%;">Points max</th>
+          <th style="width: 15%;">Barème</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row">
+          <td colspan="4"><strong>1. Règles métier (10 pts max)</strong></td>
+        </tr>
+        <tr>
+          <td>Oui — Règles claires et stables</td>
+          <td rowspan="3">Q17</td>
+          <td rowspan="3">10 pts</td>
+          <td>10 pts</td>
+        </tr>
+        <tr>
+          <td>Partiellement — Quelques exceptions</td>
+          <td>6 pts</td>
+        </tr>
+        <tr>
+          <td>Non — Beaucoup d'exceptions</td>
+          <td>2 pts</td>
+        </tr>
+        
+        <tr class="highlight-row">
+          <td colspan="4"><strong>2. Nombre de sources (5 pts max)</strong></td>
+        </tr>
+        <tr>
+          <td>1-2 sources</td>
+          <td rowspan="4">IA (Q14)</td>
+          <td rowspan="4">5 pts</td>
+          <td>5 pts</td>
+        </tr>
+        <tr>
+          <td>3-5 sources</td>
+          <td>3 pts</td>
+        </tr>
+        <tr>
+          <td>6-10 sources</td>
+          <td>1 pt</td>
+        </tr>
+        <tr>
+          <td>10+ sources</td>
+          <td>0 pt</td>
+        </tr>
+        
+        <tr class="highlight-row">
+          <td colspan="4"><strong>3. Complexité des sources (10 pts max)</strong></td>
+        </tr>
+        <tr>
+          <td>Standard (BD, CSV, Excel, JSON)</td>
+          <td rowspan="4">IA (Q14)</td>
+          <td rowspan="4">10 pts</td>
+          <td>10 pts</td>
+        </tr>
+        <tr>
+          <td>Intermédiaire (API, XML, Logs)</td>
+          <td>7 pts</td>
+        </tr>
+        <tr>
+          <td>Complexe (PDF, OCR, Audio)</td>
+          <td>4 pts</td>
+        </tr>
+        <tr>
+          <td>Non standardisée (Emails, Conversations)</td>
+          <td>1 pt</td>
+        </tr>
+        
+        <tr class="highlight-row">
+          <td colspan="4"><strong>4. Complexité organisationnelle (5 pts max)</strong></td>
+        </tr>
+        <tr>
+          <td>Simple — Une personne seule</td>
+          <td rowspan="3">Q19</td>
+          <td rowspan="3">5 pts</td>
+          <td>5 pts</td>
+        </tr>
+        <tr>
+          <td>Moyenne — Validation d'une autre personne</td>
+          <td>3 pts</td>
+        </tr>
+        <tr>
+          <td>Complexe — Coordination multi-personnes</td>
+          <td>1 pt</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="example">
+      <h4>📊 Exemple de calcul</h4>
+      <p><strong>Contexte :</strong></p>
+      <ul>
+        <li>Q17 : Règles claires → <strong>10 pts</strong></li>
+        <li>IA détecte 3 sources → <strong>3 pts</strong></li>
+        <li>IA catégorise : Intermédiaire (Excel + API) → <strong>7 pts</strong></li>
+        <li>Q19 : Validation simple → <strong>3 pts</strong></li>
+      </ul>
+      <p><strong>Score Faisabilité :</strong> 10 + 3 + 7 + 3 = <strong>23/30 points</strong></p>
+    </div>
+
+    <div class="info-box">
+      <p><strong>💡 Variables calculées par l'IA :</strong></p>
+      <ul style="margin: 8px 0 0 20px;">
+        <li><strong>Nombre de sources :</strong> Compté automatiquement depuis Q14</li>
+        <li><strong>Complexité des sources :</strong> Catégorisée selon la classification des types de données</li>
+      </ul>
+    </div>
+
+    <!-- ========================================
+         3. URGENCE (30 pts)
+    ======================================== -->
+    
+    <h2>🚨 3. Urgence (30 points max)</h2>
+    
+    <p><strong>Principe :</strong> Mesure le <strong>niveau d'irritant</strong> ressenti par l'utilisateur selon Q11 (Niveau d'irritant/urgence).</p>
+
+    <h3>🎯 Barème de scoring</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 50%;">Niveau d'irritant</th>
+          <th style="width: 25%;">Question</th>
+          <th style="width: 25%;">Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>5 — Bloquant</td>
+          <td rowspan="5">Q11</td>
+          <td>30 pts (5 × 6)</td>
+        </tr>
+        <tr>
+          <td>4 — Critique</td>
+          <td>24 pts (4 × 6)</td>
+        </tr>
+        <tr>
+          <td>3 — Important</td>
+          <td>18 pts (3 × 6)</td>
+        </tr>
+        <tr>
+          <td>2 — Modéré</td>
+          <td>12 pts (2 × 6)</td>
+        </tr>
+        <tr>
+          <td>1 — Faible gêne</td>
+          <td>6 pts (1 × 6)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="formula-box">
+      <div class="title">Formule</div>
+      <div class="formula">Score Urgence = Niveau d'irritant (Q11) × 6</div>
+    </div>
+
+    <!-- ========================================
+         GRAPHIQUE FAISABILITÉ × ETP
+    ======================================== -->
+    
+    <h2>📊 Graphique Faisabilité × ETP</h2>
+
+    <p>Le graphique 2D affiche chaque use case selon deux axes :</p>
+    <ul>
+      <li><strong>Axe X :</strong> Faisabilité Technique (0-100)</li>
+      <li><strong>Axe Y :</strong> ETP — Équivalent Temps Plein (0-5, capé à 5)</li>
+      <li><strong>Couleur du point :</strong> Indique l'urgence (rouge = élevée, jaune = moyenne, vert = faible)</li>
+    </ul>
+
+    <h3>🎨 Zones colorées du graphique</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Zone</th>
+          <th>Critères</th>
+          <th>Signification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-high">🔴 Rouge</span></td>
+          <td>Faisabilité &lt; 50 ET ETP &lt; 1</td>
+          <td><strong>À éviter</strong> — Complexe et faible impact</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-medium">🟡 Jaune</span></td>
+          <td>Autres cas</td>
+          <td><strong>À analyser</strong> — Compromis à évaluer</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-high">🟢 Vert</span></td>
+          <td>Faisabilité &gt; 50 ET ETP &gt; 1</td>
+          <td><strong>Quick Win</strong> — Simple et fort impact</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ========================================
+         CALCUL DE L'ÉCONOMIE ANNUELLE
+    ======================================== -->
+    
+    <h2>💰 Calcul de l'Économie Annuelle</h2>
+
+    <p>L'analyse IA permet de saisir le <strong>coût horaire brut du persona</strong> pour estimer l'économie financière.</p>
+
+    <h3>📐 Formules</h3>
+
+    <div class="formula-box">
+      <div class="title">Coût annuel du persona</div>
+      <div class="formula">Coût horaire brut × 7h/jour × 226 jours/an</div>
+    </div>
+
+    <div class="formula-box">
+      <div class="title">Économie annuelle estimée</div>
+      <div class="formula">Gain mensuel (heures) × 12 mois × Coût horaire brut</div>
+    </div>
+
+    <div class="info-box">
+      <p><strong>💡 Base de calcul :</strong></p>
+      <ul style="margin: 8px 0 0 20px;">
+        <li><strong>7h/jour :</strong> Journée de travail standard</li>
+        <li><strong>226 jours/an :</strong> Année complète (365j - weekends - congés - jours fériés)</li>
+        <li><strong>Coût horaire brut :</strong> Salaire + charges patronales</li>
+      </ul>
+    </div>
+
+    <div class="example">
+      <h4>📊 Exemple de calcul</h4>
+      <p><strong>Contexte :</strong></p>
+      <ul>
+        <li>Gain mensuel : 280h/mois</li>
+        <li>Coût horaire brut : 50 €/h</li>
+      </ul>
+      <p><strong>Coût annuel persona :</strong></p>
+      <p style="margin-left: 20px;">50 € × 7h × 226j = <strong>79 100 €/an</strong></p>
+      <p><strong>Économie annuelle :</strong></p>
+      <p style="margin-left: 20px;">280h × 12 × 50 € = <strong>168 000 €/an</strong></p>
+      <p><strong>Équivalent :</strong> 168 000 / 79 100 = <strong>2.1 ETP</strong></p>
+    </div>
+
+    <div class="warning-box">
+      <p><strong>⚠️ Avertissement :</strong></p>
+      <ul style="margin: 8px 0 0 20px;">
+        <li>C'est une <strong>estimation</strong> pour prioriser les projets</li>
+        <li>L'économie réelle dépend du ROI, du coût de développement et de la maintenance</li>
+        <li>Ce calcul montre le <strong>potentiel d'économie récurrente</strong> une fois l'automatisation en place</li>
+      </ul>
+    </div>
+
+    <!-- ========================================
+         EXEMPLE COMPLET
+    ======================================== -->
+    
+    <h2>🎓 Exemple Complet de Calcul</h2>
+
+    <div class="example">
+      <h4>📋 Contexte du Use Case</h4>
+      <p><strong>Tâche :</strong> Saisie manuelle de factures dans SAP</p>
+      
+      <h4>📊 Données du formulaire</h4>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Q7</strong> - Jours/mois</td>
+            <td>20 (quotidien)</td>
+          </tr>
+          <tr>
+            <td><strong>Q8</strong> - Exécutions</td>
+            <td>100 factures/jour</td>
+          </tr>
+          <tr>
+            <td><strong>Q9</strong> - Temps unitaire</td>
+            <td>10 minutes (0.17h)</td>
+          </tr>
+          <tr>
+            <td><strong>Q10</strong> - Personnes</td>
+            <td>2 personnes</td>
+          </tr>
+          <tr>
+            <td><strong>Q11</strong> - Irritant</td>
+            <td>4/5 (Critique)</td>
+          </tr>
+          <tr>
+            <td><strong>Q17</strong> - Règles</td>
+            <td>Partiellement (quelques exceptions)</td>
+          </tr>
+          <tr>
+            <td><strong>Q19</strong> - Complexité orga</td>
+            <td>Moyenne (validation nécessaire)</td>
+          </tr>
+          <tr>
+            <td><strong>IA (Q14)</strong> - Sources</td>
+            <td>2 sources : Excel + SAP (Intermédiaire)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>🧮 Calculs</h4>
+      
+      <p><strong>1️⃣ Impact (ETP) — Non scoré :</strong></p>
+      <p style="margin-left: 20px;">
+        Gain mensuel = 20j × 100 exec × 0.17h × 2 personnes = <strong>680h/mois</strong><br>
+        ETP = 680h / 140h = <strong>4.9 ETP</strong>
+      </p>
+
+      <p><strong>2️⃣ Faisabilité Technique :</strong></p>
+      <p style="margin-left: 20px;">
+        Règles : 6 pts<br>
+        Nb sources (2) : 5 pts<br>
+        Complexité sources (Intermédiaire) : 7 pts<br>
+        Complexité orga : 3 pts<br>
+        <strong>Score = 6 + 5 + 7 + 3 = 21/30 pts</strong>
+      </p>
+
+      <p><strong>3️⃣ Urgence :</strong></p>
+      <p style="margin-left: 20px;">
+        <strong>Score = 4 × 6 = 24/30 pts</strong>
+      </p>
+
+      <h4>🎯 Résumé des Indicateurs</h4>
+      <div class="success-box">
+        <p style="margin: 0;">
+          <strong>Faisabilité Technique :</strong> 70/100 <span class="badge badge-high">🟢 Élevée</span><br>
+          <strong>Urgence :</strong> 80/100 <span class="badge badge-high">🟢 Élevée</span><br>
+          <strong>Impact (ETP) :</strong> 4.9 ETP/mois <span class="badge badge-high">🟢 Fort</span>
+        </p>
+      </div>
+
+      <h4>📊 Détails de l'Impact</h4>
+      <ul>
+        <li><strong>Gain de temps :</strong> 680h/mois = <strong>4.9 ETP</strong></li>
+        <li><strong>Économie annuelle</strong> (avec coût 50 €/h) : 680h × 12 mois × 50€ = <strong>408 000 €/an</strong></li>
+      </ul>
+      
+      <div class="info-box" style="margin-top: 15px;">
+        <p><strong>💡 Conclusion :</strong> Projet avec <strong>faisabilité élevée</strong>, <strong>urgence élevée</strong> ET <strong>fort impact (4.9 ETP)</strong> = Excellent candidat pour l'automatisation 🎯</p>
+      </div>
+    </div>
+
+    <!-- ========================================
+         FAQ
+    ======================================== -->
+    
+    <h2>❓ Questions Fréquentes</h2>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      
+      <h4>Q : Le scoring est-il calculé par l'IA ?</h4>
+      <p><strong>R :</strong> Non, le scoring est 100% <strong>algorithmique et déterministe</strong>. L'IA analyse uniquement les sources (Q14) pour compter et catégoriser. Le reste est calculé mathématiquement par le backend.</p>
+
+      <h4 style="margin-top: 20px;">Q : Pourquoi le gain de temps peut-il être si élevé ?</h4>
+      <p><strong>R :</strong> Le calcul cumule le temps de <strong>toutes les personnes</strong>. Si 5 personnes passent chacune 50h/mois sur une tâche, le gain total est de 250h/mois pour l'organisation.</p>
+
+      <h4 style="margin-top: 20px;">Q : Comment obtenir le coût horaire brut ?</h4>
+      <p><strong>R :</strong> Demandez à votre RH ou utilisez cette approximation :<br>
+      <code>Coût horaire brut ≈ (Salaire annuel brut × 1.4) / 1582h</code><br>
+      <em>Exemple : (50 000 € × 1.4) / 1 582 = 44 €/h</em></p>
+
+      <h4 style="margin-top: 20px;">Q : Le calcul est-il toujours exact ?</h4>
+      <p><strong>R :</strong> Non, c'est une <strong>estimation</strong> pour prioriser. Les fourchettes donnent des ordres de grandeur. Utilisez les valeurs médianes pour plus de précision.</p>
+
+      <h4 style="margin-top: 20px;">Q : Que signifie "ETP capé à 5" sur le graphique ?</h4>
+      <p><strong>R :</strong> Si le calcul donne un ETP > 5, le point sera affiché en haut du graphique avec la mention "5+". Cela permet de garder l'échelle lisible tout en signalant les très gros projets.</p>
+
+    </div>
+
+    <!-- ========================================
+         FOOTER
+    ======================================== -->
+    
+    <hr style="margin: 40px 0; border: none; border-top: 2px solid var(--border);">
+
+    <div style="text-align: center; padding: 20px;">
+      <a href="index.html" class="back-link">← Retour au formulaire</a>
+    </div>
+
+  </div>
+</body>
+</html>

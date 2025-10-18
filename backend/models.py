@@ -160,13 +160,11 @@ class ProCon(BaseModel):
 
 
 class Scoring(BaseModel):
-    """Scoring détaillé sur 100"""
+    """Scoring : Faisabilité et Urgence (pas de score total)"""
     model_config = {"extra": "forbid"}
     
-    impact_business_score: str  # Format: "17/40"
-    faisabilite_technique_score: str  # Format: "27/30"
-    urgence_score: str  # Format: "24/30"
-    total: int = Field(ge=0, le=100)
+    faisabilite_technique_score: str  # Format: "27/100"
+    urgence_score: str  # Format: "80/100"
     formula: str
     justification: str
     gain_temps_mensuel_heures: int = Field(ge=0)

@@ -110,7 +110,8 @@ class ElementsSources(BaseModel):
     model_config = {"extra": "forbid"}
     
     types: List[ElementSource]
-    count: int = Field(ge=0)
+    count: int = Field(ge=0)  # Nombre de types uniques
+    total_sources: int = Field(ge=0)  # Nombre total de sources
     complexity_level: ComplexityLevel
 
 

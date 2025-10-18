@@ -1,6 +1,7 @@
 // ==================== NAVIGATION ULTRA SIMPLE ====================
 let currentStep = 1;
 const TOTAL_STEPS = 6; // Nombre total de pages
+let currentAnalysisResult = null; // Stocke les données du formulaire + analyse IA
 
 window.goToStep = function(step) {
   console.log('>>> GO TO STEP:', step);
@@ -77,6 +78,22 @@ const STORAGE_KEY = "cm_form_pd_v1";
     for (const [key, value] of formData.entries()) {
     data[key] = value || "";
   }
+  
+    // Gérer Q9 : combiner les 3 champs (jours, heures, minutes) en un format lisible
+    const days = parseInt(data.q9_days || 0);
+    const hours = parseInt(data.q9_hours || 0);
+    const minutes = parseInt(data.q9_minutes || 0);
+    
+    // Créer une chaîne lisible
+    const parts = [];
+    if (days > 0) parts.push(`${days}j`);
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}min`);
+    
+    data.q9 = parts.length > 0 ? parts.join(' ') : "0min";
+    
+    // Stocker aussi le temps total en heures pour le calcul
+    data.q9_total_hours = days * 7 + hours + minutes / 60;
 
     return data;
   }
@@ -492,7 +509,8 @@ document.addEventListener('DOMContentLoaded', function() {
               ).join('')}
             </div>
             <p style="margin-top: 8px;">
-              <strong>Nombre de types :</strong> ${result.elements_sources.count}
+              <strong>Nombre de sources :</strong> ${result.elements_sources.total_sources}
+              <span style="margin-left: 15px;"><strong>Nombre de types :</strong> ${result.elements_sources.count}</span>
               <span style="margin-left: 15px;"><strong>Catégorie :</strong> 
                 <span style="padding: 2px 8px; background: #fff; border-radius: 4px; font-weight: 600;">${escapeHtml(result.elements_sources.complexity_level)}</span>
               </span>
@@ -509,6 +527,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const output = aiAnalysisOutput;
     if (!output) return;
     
+    // Calculer les valeurs pour la formule détaillée
+    if (!currentAnalysisResult || !currentAnalysisResult.form_data) {
+      console.error('currentAnalysisResult non disponible');
+      return;
+    }
+    const formData = currentAnalysisResult.form_data;
+    const freqVal = parseFloat(formData.q7) || 0;
+    const execVal = parseInt(formData.q8) || 0;
+    
+    // Parser Q9 (format "1j 2h 30min" ou combinaison)
+    let timeVal = 0;
+    if (formData.q9) {
+      const daysMatch = formData.q9.match(/(\d+)j/);
+      const hoursMatch = formData.q9.match(/(\d+)h/);
+      const minsMatch = formData.q9.match(/(\d+)min/);
+      
+      if (daysMatch) timeVal += parseInt(daysMatch[1]) * 7;
+      if (hoursMatch) timeVal += parseInt(hoursMatch[1]);
+      if (minsMatch) timeVal += parseInt(minsMatch[1]) / 60;
+    }
+    
+    // Q10 - Nombre de personnes
+    const peopleVal = parseInt(formData.q10) || 1;
+    
+    // Calcul
+    const tempsParPersonne = freqVal * execVal * timeVal;
+    const tempsMensuelTotal = result.scoring.gain_temps_mensuel_heures;
+    const etp = (tempsMensuelTotal / 140).toFixed(1);
+    
     const html = `
       <div class="analysis-result">
         <div class="analysis-section">
@@ -517,7 +564,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="scoring-left">
               <div class="scoring-row">
                 <span>Impact Business</span>
-                <span class="score-number">${result.scoring.impact_business_score}</span>
+                <span class="score-number" style="font-size: 20px; font-weight: 700; color: #0d6efd;">${etp} ETP/mois</span>
               </div>
               <div class="scoring-row">
                 <span>Faisabilité Technique</span>
@@ -527,16 +574,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span>Urgence</span>
                 <span class="score-number">${result.scoring.urgence_score}</span>
               </div>
-              <div class="gain-temps-box">
-                <strong>⏱️ Gain de temps estimé :</strong> ${result.scoring.gain_temps_mensuel_heures}h/mois
-                <div style="margin-top: 4px; font-size: 13px; color: #6c757d;">
-                  = ${(result.scoring.gain_temps_mensuel_heures / 140).toFixed(1)} ETP <span style="font-size: 11px;">(base 7h/jour × 20 jours)</span>
+              <div class="gain-temps-box" style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-top: 12px;">
+                <strong>⏱️ Gain de temps estimé :</strong> ${tempsMensuelTotal}h/mois = <strong>${etp} ETP</strong> <span style="font-size: 11px; color: #6c757d;">(base 7h/jour × 20 jours)</span>
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #dee2e6; font-size: 12px; color: #495057; font-family: 'Courier New', monospace;">
+                  <div style="margin-bottom: 4px;"><strong>📐 Formule de calcul :</strong></div>
+                  <div style="margin-left: 10px;">
+                    <div>1️⃣ Temps par personne = Fréquence × Nb exec × Temps unitaire</div>
+                    <div style="margin-left: 20px; color: #6c757d;">
+                      = ${freqVal} × ${execVal} × ${timeVal.toFixed(2)}h = <strong>${tempsParPersonne.toFixed(1)}h/mois</strong>
+                    </div>
+                    <div style="margin-top: 6px;">2️⃣ Gain total mensuel = Temps par personne × Nb personnes</div>
+                    <div style="margin-left: 20px; color: #0d6efd; font-weight: 600;">
+                      = ${tempsParPersonne.toFixed(1)}h × ${peopleVal} = <strong>${tempsMensuelTotal}h/mois</strong>
+                    </div>
+                    <div style="margin-top: 6px;">3️⃣ ETP = Gain total mensuel ÷ 140h</div>
+                    <div style="margin-left: 20px; color: #0d6efd; font-weight: 600;">
+                      = ${tempsMensuelTotal}h ÷ 140h = <strong>${etp} ETP</strong>
+                    </div>
+                  </div>
+                  <div style="margin-top: 8px; font-size: 11px; color: #6c757d; font-family: system-ui;">
+                    💡 Avec Q7=${freqVal}/mois, Q8=${execVal}, Q9="${formData.q9}", Q10=${peopleVal}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="cout-horaire-box" style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-top: 12px; border: 1px solid #ffc107;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                  <strong>💰 Coût horaire du persona :</strong>
+                  <input type="number" id="cout-horaire-input" min="0" step="1" placeholder="Ex: 50" 
+                         style="width: 100px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+                  <span style="font-size: 14px; color: #495057;">€/h</span>
+                </div>
+                <div id="cout-annuel-display" style="font-size: 13px; color: #856404; display: none;">
+                  <strong>📊 Économie annuelle estimée :</strong> <span id="cout-annuel-value" style="font-weight: 700; color: #28a745; font-size: 16px;"></span>
                 </div>
               </div>
             </div>
             <div class="scoring-right">
-              <div class="graph-title">Faisabilité × Impact Business</div>
+              <div class="graph-title">Faisabilité × ETP</div>
               <canvas id="scoring-chart" width="300" height="300"></canvas>
+              <div style="text-align: center; font-size: 11px; color: #6c757d; margin-top: 8px;">
+                <span>Couleur du point = Urgence</span>
+              </div>
             </div>
           </div>
           
@@ -612,6 +691,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Dessiner le graphique après insertion du HTML
     setTimeout(function() {
       drawScoringChart(result.scoring);
+      
+      // Ajouter l'event listener pour le calcul du coût annuel
+      const coutHoraireInput = document.getElementById('cout-horaire-input');
+      const coutAnnuelDisplay = document.getElementById('cout-annuel-display');
+      const coutAnnuelValue = document.getElementById('cout-annuel-value');
+      
+      if (coutHoraireInput && coutAnnuelDisplay && coutAnnuelValue) {
+        coutHoraireInput.addEventListener('input', function() {
+          const coutHoraire = parseFloat(coutHoraireInput.value);
+          if (coutHoraire && coutHoraire > 0) {
+            const coutAnnuel = tempsMensuelTotal * 12 * coutHoraire;
+            coutAnnuelValue.textContent = coutAnnuel.toLocaleString('fr-FR') + ' €/an';
+            coutAnnuelDisplay.style.display = 'block';
+          } else {
+            coutAnnuelDisplay.style.display = 'none';
+          }
+        });
+      }
     }, 100);
   }
   
@@ -629,41 +726,52 @@ document.addEventListener('DOMContentLoaded', function() {
       return { numerator: parseInt(parts[0]), denominator: parseInt(parts[1]) };
     };
     
-    const impact = parseRatio(scoring.impact_business_score);
-    const faisabilite = parseRatio(scoring.faisabilite_technique_score);
+    const faisabilite = parseRatio(scoring.faisabilite_technique_score); // X: 0-100
     const urgence = parseRatio(scoring.urgence_score);
+    // ETP: calculer depuis gain_temps_mensuel_heures
+    const etp = scoring.gain_temps_mensuel_heures / 140; // Y: 0-10 (capé)
+    const etpCapped = Math.min(etp, 10); // Capper à 10 pour l'affichage
     
     // Fond
     ctx.fillStyle = '#f8f9fa';
     ctx.fillRect(0, 0, width, height);
     
-    // Cadrans colorés
-    // Haut droite (forte faisabilité, fort impact): VERT
-    ctx.fillStyle = 'rgba(25, 135, 84, 0.15)';
-    ctx.fillRect(width / 2, 0, width / 2, height / 2);
+    // Zones colorées selon faisabilité et ETP
+    // Faisabilité 50 = x = width/2
+    // ETP 1 = y = height - (height/10) car échelle 0-10 et Y inversé
+    const fais50X = (50 / 100) * width; // Position X de faisabilité = 50
+    const etp1Y = height - ((1 / 10) * height); // Position Y de ETP = 1
     
-    // Haut gauche (forte impact, faible faisabilité): JAUNE
-    ctx.fillStyle = 'rgba(255, 193, 7, 0.15)';
-    ctx.fillRect(0, 0, width / 2, height / 2);
+    // Zone rouge : Faisabilité < 50 ET ETP < 1 (bas-gauche)
+    ctx.fillStyle = 'rgba(220, 53, 69, 0.15)'; // Rouge
+    ctx.fillRect(0, etp1Y, fais50X, height - etp1Y);
     
-    // Bas droite (forte faisabilité, faible impact): JAUNE
-    ctx.fillStyle = 'rgba(255, 193, 7, 0.15)';
-    ctx.fillRect(width / 2, height / 2, width / 2, height / 2);
+    // Zone verte : Faisabilité > 50 ET ETP > 1 (haut-droite)
+    ctx.fillStyle = 'rgba(25, 135, 84, 0.15)'; // Vert
+    ctx.fillRect(fais50X, 0, width - fais50X, etp1Y);
     
-    // Bas gauche (faible faisabilité, faible impact): ROUGE
-    ctx.fillStyle = 'rgba(220, 53, 69, 0.15)';
-    ctx.fillRect(0, height / 2, width / 2, height / 2);
+    // Zone jaune : haut-gauche (Fais < 50, ETP > 1)
+    ctx.fillStyle = 'rgba(255, 193, 7, 0.15)'; // Jaune
+    ctx.fillRect(0, 0, fais50X, etp1Y);
+    
+    // Zone jaune : bas-droite (Fais > 50, ETP < 1)
+    ctx.fillStyle = 'rgba(255, 193, 7, 0.15)'; // Jaune
+    ctx.fillRect(fais50X, etp1Y, width - fais50X, height - etp1Y);
     
     // Grille
     ctx.strokeStyle = '#dee2e6';
     ctx.lineWidth = 1;
+    // Lignes verticales (tous les 25 pour faisabilité 0-100)
     for (let i = 0; i <= 4; i++) {
       const x = (width / 4) * i;
-      const y = (height / 4) * i;
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, height);
       ctx.stroke();
+    }
+    // Lignes horizontales (tous les 2 ETP pour 0-10)
+    for (let i = 0; i <= 5; i++) {
+      const y = (height / 5) * i;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
@@ -682,20 +790,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Labels des axes
     ctx.fillStyle = '#495057';
     ctx.font = '11px sans-serif';
-    ctx.fillText('Impact Business →', width - 120, height - 5);
+    ctx.fillText('Faisabilité →', width - 85, height - 5);
     ctx.save();
-    ctx.translate(10, 100);
+    ctx.translate(10, 60);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText('Faisabilité →', 0, 0);
+    ctx.fillText('ETP →', 0, 0);
     ctx.restore();
     
+    // Graduations Y (ETP)
+    ctx.font = '9px sans-serif';
+    ctx.fillStyle = '#6c757d';
+    for (let i = 0; i <= 5; i++) {
+      const y = height - ((i * 2) / 10) * height; // Tous les 2 ETP
+      ctx.fillText((i * 2).toString(), 5, y + 3);
+    }
+    
     // Calculer position du point (inverser Y car canvas a Y=0 en haut)
-    // Tout est en base 100 maintenant
-    const impactNorm = impact.numerator / 100; // 0-1
     const faisabiliteNorm = faisabilite.numerator / 100; // 0-1
+    const etpNorm = etpCapped / 10; // 0-1 (sur échelle 0-10)
     const urgenceNorm = urgence.numerator / 100; // 0-1
-    const x = impactNorm * width;
-    const y = height - (faisabiliteNorm * height); // Inverser Y
+    const x = faisabiliteNorm * width;
+    const y = height - (etpNorm * height); // Inverser Y
     
     // Couleur selon urgence
     let pointColor;
@@ -712,12 +827,13 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.lineWidth = 3;
     ctx.stroke();
     
-    // Score total au centre du point
+    // ETP au centre du point
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 10px sans-serif';
+    ctx.font = 'bold 9px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(scoring.total, x, y);
+    const etpText = etp < 10 ? etp.toFixed(1) : '10+';
+    ctx.fillText(etpText, x, y);
     
     // Légende pour l'urgence (en bas à l'intérieur du graphique)
     ctx.font = '9px sans-serif';

@@ -30,35 +30,70 @@ MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o")
 
 
 # ==================== CALCUL DU SCORING ====================
-def calculate_scoring(form_data: FormData, elements_count: int, complexity_category: str = "Standard") -> Scoring:
+def calculate_scoring(form_data: FormData, elements_count: int, total_sources: int, complexity_category: str = "Standard") -> Scoring:
     """
     Calcule le scoring de manière déterministe côté backend.
     Basé sur les réponses du formulaire + analyse IA (nombre et catégorie des sources).
     """
-    # IMPACT BUSINESS (0-40 points)
-    impact_score = 0
+    # Helper: Parser Q9 (format "1j 2h 30min" ou juste nombre) en heures
+    def parse_time_to_hours(time_str: str) -> float:
+        if not time_str:
+            return 0
+        hours = 0
+        # Parser format "1j 2h 30min"
+        import re
+        days_match = re.search(r'(\d+)j', time_str)
+        hours_match = re.search(r'(\d+)h', time_str)
+        mins_match = re.search(r'(\d+)min', time_str)
+        
+        if days_match:
+            hours += int(days_match.group(1)) * 7  # 1 jour = 7h
+        if hours_match:
+            hours += int(hours_match.group(1))
+        if mins_match:
+            hours += int(mins_match.group(1)) / 60
+            
+        return hours
     
-    # Q7 - Fréquence du besoin
-    freq_map = {"Quotidien": 10, "Hebdomadaire": 7, "Mensuel": 4, "Occasionnel": 2}
-    impact_score += freq_map.get(form_data.q7, 0)
+    # Q7 - Fréquence (jours par mois - valeur brute saisie)
+    try:
+        freq_val = float(form_data.q7 or 0)
+    except (ValueError, TypeError):
+        freq_val = 0
     
-    # Q8 - Nombre d'exécutions
-    exec_map = {"1": 1, "2-10": 3, "11-50": 5, "51-200": 7, "200+": 10}
-    impact_score += exec_map.get(form_data.q8, 0)
+    # Q8 - Nombre d'exécutions (valeur brute)
+    try:
+        exec_val = int(form_data.q8 or 0)
+    except ValueError:
+        exec_val = 0
     
-    # Q9 - Temps unitaire (avec et sans espaces pour compatibilité formulaire)
-    time_map = {
-        "<10min": 1, "< 10 min": 1,
-        "10-30min": 3, "10-30 min": 3,
-        "30min-1h": 5, "30 min - 1h": 5,
-        "1-2h": 7,
-        ">2h": 10, "> 2h": 10
-    }
-    impact_score += time_map.get(form_data.q9, 0)
+    # Q9 - Temps unitaire en heures
+    time_val = parse_time_to_hours(form_data.q9 or "")
     
-    # Q10 - Nombre de personnes
-    people_map = {"1": 1, "2-5": 3, "6-20": 5, "21-50": 7, "50+": 10}
-    impact_score += people_map.get(form_data.q10, 0)
+    # Q10 - Nombre de personnes (valeur brute saisie)
+    try:
+        people_val = int(form_data.q10 or 1)
+    except (ValueError, TypeError):
+        people_val = 1
+    
+    # CALCUL IMPACT BUSINESS : Temps total mensuel (heures)
+    # Temps par personne
+    temps_par_personne = freq_val * exec_val * time_val
+    # Gain total = temps par personne × nombre de personnes
+    temps_mensuel_total = temps_par_personne * people_val
+    
+    # Normaliser sur 40 points (basé sur le gain total)
+    # Barème : 0-200h=0-10pts, 200-1000h=10-20pts, 1000-4000h=20-30pts, 4000h+=30-40pts
+    if temps_mensuel_total <= 200:
+        impact_score = int(temps_mensuel_total / 20)  # 0-10 pts
+    elif temps_mensuel_total <= 1000:
+        impact_score = 10 + int((temps_mensuel_total - 200) / 80)  # 10-20 pts
+    elif temps_mensuel_total <= 4000:
+        impact_score = 20 + int((temps_mensuel_total - 1000) / 300)  # 20-30 pts
+    else:
+        impact_score = 30 + min(10, int((temps_mensuel_total - 4000) / 1000))  # 30-40 pts
+    
+    impact_score = min(40, max(0, impact_score))
     
     # FAISABILITÉ TECHNIQUE (0-30 points)
     faisabilite_score = 0
@@ -67,15 +102,18 @@ def calculate_scoring(form_data: FormData, elements_count: int, complexity_categ
     rules_map = {"Oui": 10, "Partiellement": 6, "Non": 2}
     faisabilite_score += rules_map.get(form_data.q17, 0)
     
-    # Nombre de types de sources + Catégorie de complexité (calculés par l'IA)
-    # Points basés sur le nombre de types (max 5 points)
-    if elements_count <= 2:
-        count_points = 5
-    elif elements_count <= 4:
-        count_points = 3
+    # Nombre de sources + Catégorie de complexité (calculés par l'IA)
+    # Points basés sur le nombre TOTAL de sources (max 5 points)
+    # Plus il y a de sources, plus c'est complexe à intégrer
+    if total_sources <= 2:
+        sources_points = 5
+    elif total_sources <= 5:
+        sources_points = 3
+    elif total_sources <= 10:
+        sources_points = 1
     else:
-        count_points = 1
-    faisabilite_score += count_points
+        sources_points = 0  # Très nombreuses sources
+    faisabilite_score += sources_points
     
     # Points basés sur la catégorie de complexité (max 5 points)
     complexity_category_map = {
@@ -111,40 +149,17 @@ def calculate_scoring(form_data: FormData, elements_count: int, complexity_categ
     urgence_normalized = round((urgence_score / 30) * 100)
     
     # GAIN TEMPS MENSUEL (heures)
-    # Fréquence = nombre d'occurrences par mois (sur 20 jours ouvrés)
-    freq_factor = {"Quotidien": 20, "Hebdomadaire": 5, "Mensuel": 1, "Occasionnel": 0.5}
-    # Nombre d'exécutions par occurrence (valeur médiane de chaque fourchette)
-    exec_factor = {"1": 1, "2-10": 6, "11-50": 30, "51-200": 125, "200+": 200}
-    # Temps par exécution en heures (avec et sans espaces pour compatibilité)
-    time_factor = {
-        "<10min": 0.1, "< 10 min": 0.1,
-        "10-30min": 0.33, "10-30 min": 0.33,
-        "30min-1h": 0.75, "30 min - 1h": 0.75,
-        "1-2h": 1.5,
-        ">2h": 3, "> 2h": 3
-    }
-    # Nombre de personnes (valeur médiane)
-    people_factor = {"1": 1, "2-5": 3, "6-20": 10, "21-50": 30, "50+": 50}
-    
-    freq_val = freq_factor.get(form_data.q7, 0)
-    exec_val = exec_factor.get(form_data.q8, 0)
-    time_val = time_factor.get(form_data.q9, 0)
-    people_val = people_factor.get(form_data.q10, 1)
-    
-    # FORMULE : (Fréquence × Nb exec × Temps par exec) = heures totales par mois pour l'équipe
-    # Note: On ne multiplie PAS par le nombre de personnes car elles se partagent le travail
-    # Mais on utilise le nombre de personnes pour ajuster le calcul si nécessaire
-    gain_temps = int(freq_val * exec_val * time_val)
+    # C'est le temps mensuel total calculé précédemment
+    gain_temps = int(temps_mensuel_total)
     
     # Formule lisible
     complexity_points = complexity_category_map.get(complexity_category, 0)
     formula = (
-        f"Impact[Fréquence({form_data.q7}={freq_map.get(form_data.q7, 0)}) + "
-        f"NbExec({form_data.q8}={exec_map.get(form_data.q8, 0)}) + "
-        f"Temps({form_data.q9}={time_map.get(form_data.q9, 0)}) + "
-        f"Personnes({form_data.q10}={people_map.get(form_data.q10, 0)}) = {impact_score}/40 = {impact_normalized}/100] + "
+        f"Impact[TempsMensuel({temps_mensuel_total:.1f}h) = Fréquence({freq_val}j/mois) × "
+        f"NbExec({exec_val}) × Temps({time_val:.2f}h) × "
+        f"NbPersonnes({people_val}) = {impact_score}/40 = {impact_normalized}/100] + "
         f"Faisabilité[Règles({form_data.q17}={rules_map.get(form_data.q17, 0)}) + "
-        f"NbTypesSources({elements_count}={count_points}pts) + "
+        f"NbSources({total_sources}={sources_points}pts) + "
         f"CatégorieSources({complexity_category}={complexity_points}pts) + "
         f"ComplexitéOrga({form_data.q19}={complexity_map.get(form_data.q19, 0)}) + "
         f"ActionManuelle({form_data.q15}={manual_map.get(form_data.q15, 0)}) = {faisabilite_score}/30 = {faisabilite_normalized}/100] + "
@@ -154,9 +169,10 @@ def calculate_scoring(form_data: FormData, elements_count: int, complexity_categ
     
     justification = (
         f"Score de {total}/100 basé sur : Impact Business {impact_normalized}/100 "
-        f"(fréquence {form_data.q7}, {form_data.q8} exécutions, {form_data.q9} par exécution, "
-        f"{form_data.q10} personnes), Faisabilité Technique {faisabilite_normalized}/100 "
-        f"({elements_count} types de sources catégorie {complexity_category}, règles {form_data.q17 or 'non spécifié'}, "
+        f"(temps mensuel total {temps_mensuel_total:.1f}h = fréquence {freq_val}/mois × {exec_val} exécutions × "
+        f"{form_data.q9} × {people_val} personnes), "
+        f"Faisabilité Technique {faisabilite_normalized}/100 "
+        f"({total_sources} sources ({elements_count} types) catégorie {complexity_category}, règles {form_data.q17 or 'non spécifié'}, "
         f"complexité orga {form_data.q19 or 'non spécifié'}), Urgence {urgence_normalized}/100 "
         f"(irritant {form_data.q11}/5)."
     )
@@ -305,7 +321,8 @@ Outils: """ + (d.q20 or '-') + """
 
 3. ELEMENTS SOURCES (Q14):
    - types: Catégorise STRICTEMENT chaque source
-   - count: Nombre de TYPES UNIQUES (Excel GL + Excel OSB = 1 seul type)
+   - count: Nombre de TYPES UNIQUES (Excel GL + Excel OSB + SAP = 2 types: Excel, ERP_CRM)
+   - total_sources: Nombre TOTAL de sources (Excel GL + Excel OSB + SAP = 3 sources)
    - complexity_level: Catégorise la complexité globale selon :
      * Standard: Sources structurées et faciles (BD, CSV, XLSX, JSON)
      * Intermédiaire: Semi-structurées, traitement modéré (APIs, XML, logs)
@@ -426,9 +443,10 @@ Outils: """ + (d.q20 or '-') + """
         
         # CALCUL DU SCORING CÔTÉ BACKEND (déterministe)
         logger.info("\n🧮 Calcul du scoring côté backend...")
-        elements_count = result_json.get('elements_sources', {}).get('count', 0)
+        elements_count = result_json.get('elements_sources', {}).get('count', 0)  # Nombre de types
+        total_sources = result_json.get('elements_sources', {}).get('total_sources', 0)  # Nombre total de sources
         complexity_category = result_json.get('elements_sources', {}).get('complexity_level', 'Standard')
-        calculated_scoring = calculate_scoring(req.form_data, elements_count, complexity_category)
+        calculated_scoring = calculate_scoring(req.form_data, elements_count, total_sources, complexity_category)
         
         # Remplacer le scoring par notre calcul
         result_json['scoring'] = {

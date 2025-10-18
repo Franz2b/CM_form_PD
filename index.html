@@ -92,54 +92,49 @@
           <h2 style="color: #0d6efd; font-size: 18px; margin-bottom: 8px;">Quel est l'impact ?</h2>
           <p class="hint">Évaluez l'ampleur du problème : combien de fois, combien de temps, combien de personnes concernées ?</p>
           <br><hr><br>
-          <fieldset class="form-group">
-            <legend>Q7. Fréquence du besoin</legend>
-            <p class="hint">À quelle fréquence le besoin se présente-t-il ?</p>
-            <div class="options" role="radiogroup">
-              <label><input type="radio" name="q7" value="Plusieurs fois par jour" /> Plusieurs fois par jour</label>
-              <label><input type="radio" name="q7" value="Quotidien" /> Quotidien</label>
-              <label><input type="radio" name="q7" value="Hebdomadaire" /> Hebdomadaire</label>
-              <label><input type="radio" name="q7" value="Mensuel" /> Mensuel</label>
-              <label><input type="radio" name="q7" value="Occasionnel" /> Occasionnel</label>
-            </div>
-          </fieldset>
+          <div class="form-group">
+            <label for="q7">Q7. Fréquence du besoin (jours par mois)</label>
+            <p class="hint">Combien de jours par mois la tâche doit-elle être exécutée ? (sur une base de 20 jours ouvrés)</p>
+            <p class="hint-examples">💡 Exemples : Quotidien = 20, Hebdomadaire = 5, Mensuel = 1</p>
+            <input type="number" id="q7" name="q7" min="0.1" step="0.1" placeholder="Ex: 5" required />
+            <p class="hint" style="font-size: 12px; color: #6c757d; margin-top: 4px;">Saisissez le nombre de jours par mois (décimales autorisées)</p>
+          </div>
 
-          <fieldset class="form-group">
-            <legend>Q8. Nombre d'exécutions de la tâche à chaque occurrence</legend>
+          <div class="form-group">
+            <label for="q8">Q8. Nombre d'exécutions de la tâche à chaque occurrence (en moyenne)</label>
             <p class="hint">Quand le besoin se présente, combien de fois la tâche est-elle exécutée ?</p>
             <p class="hint-examples">💡 Exemple : Si c'est mensuel (clôture comptable), est-ce 1 fois, 20 fois, 100 fois ce jour-là ?</p>
-            <div class="options" role="radiogroup">
-              <label><input type="radio" name="q8" value="1" /> 1 seule fois</label>
-              <label><input type="radio" name="q8" value="2-10" /> 2-10 fois</label>
-              <label><input type="radio" name="q8" value="11-50" /> 11-50 fois</label>
-              <label><input type="radio" name="q8" value="51-200" /> 51-200 fois</label>
-              <label><input type="radio" name="q8" value="200+" /> 200+ fois</label>
-            </div>
-          </fieldset>
+            <input type="number" id="q8" name="q8" min="1" step="1" placeholder="Ex: 50" required />
+            <p class="hint" style="font-size: 12px; color: #6c757d; margin-top: 4px;">Saisissez un nombre entier (pas besoin d'être précis au chiffre près, une estimation suffit)</p>
+          </div>
 
-          <fieldset class="form-group">
-            <legend>Q9. Temps d'exécution unitaire de la tâche</legend>
-            <p class="hint">Combien de temps prend UNE exécution de la tâche ?</p>
-            <div class="options" role="radiogroup">
-              <label><input type="radio" name="q9" value="< 10 min" /> < 10 min</label>
-              <label><input type="radio" name="q9" value="10-30 min" /> 10-30 min</label>
-              <label><input type="radio" name="q9" value="30 min - 1h" /> 30 min - 1h</label>
-              <label><input type="radio" name="q9" value="1-2h" /> 1-2h</label>
-              <label><input type="radio" name="q9" value="> 2h" /> > 2h</label>
+          <div class="form-group">
+            <label>Q9. Temps d'exécution unitaire de la tâche (en moyenne)</label>
+            <p class="hint">Combien de temps prend UNE exécution de la tâche ? Décomposez en jours, heures et/ou minutes.</p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 10px;">
+              <div>
+                <label for="q9_days" style="font-size: 13px; display: block; margin-bottom: 4px;">Jour(s)</label>
+                <input type="number" id="q9_days" name="q9_days" min="0" step="1" placeholder="0" style="width: 100%;" />
+              </div>
+              <div>
+                <label for="q9_hours" style="font-size: 13px; display: block; margin-bottom: 4px;">Heure(s)</label>
+                <input type="number" id="q9_hours" name="q9_hours" min="0" step="1" placeholder="0" style="width: 100%;" />
+              </div>
+              <div>
+                <label for="q9_minutes" style="font-size: 13px; display: block; margin-bottom: 4px;">Minute(s)</label>
+                <input type="number" id="q9_minutes" name="q9_minutes" min="0" step="1" placeholder="0" style="width: 100%;" />
+              </div>
             </div>
-          </fieldset>
+            <p class="hint-examples" style="margin-top: 8px;">💡 Exemple : Pour une tâche de 1h30, saisissez 1 heure et 30 minutes</p>
+          </div>
 
-          <fieldset class="form-group">
-            <legend>Q10. Nombre actuel de personnes exécutant cette tâche</legend>
+          <div class="form-group">
+            <label for="q10">Q10. Nombre actuel de personnes exécutant cette tâche</label>
             <p class="hint">Combien de personnes réalisent actuellement cette tâche ?</p>
-            <div class="options" role="radiogroup">
-              <label><input type="radio" name="q10" value="1" /> 1 personne</label>
-              <label><input type="radio" name="q10" value="2-5" /> 2-5 personnes</label>
-              <label><input type="radio" name="q10" value="6-20" /> 6-20 personnes</label>
-              <label><input type="radio" name="q10" value="21-50" /> 21-50 personnes</label>
-              <label><input type="radio" name="q10" value="50+" /> 50+ personnes</label>
-            </div>
-          </fieldset>
+            <p class="hint-examples">💡 Si plusieurs personnes font la même tâche, le gain total sera multiplié par ce nombre</p>
+            <input type="number" id="q10" name="q10" min="1" step="1" placeholder="Ex: 5" required />
+            <p class="hint" style="font-size: 12px; color: #6c757d; margin-top: 4px;">Saisissez le nombre de personnes concernées</p>
+          </div>
 
           <fieldset class="form-group">
             <legend>Q11. Niveau d'irritant / urgence</legend>

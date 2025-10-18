@@ -214,82 +214,74 @@
 
     <!-- ============= IMPACT BUSINESS ============= -->
     <h2>1️⃣ IMPACT BUSINESS (/40 points)</h2>
-    <p>Mesure l'impact métier potentiel de l'automatisation.</p>
+    <p>Mesure l'impact métier potentiel de l'automatisation basé sur le <strong>temps total gagné mensuellement</strong>.</p>
     
     <div class="highlight">
-      <strong>Formule :</strong> Fréquence + Nb exécutions + Temps unitaire + Nb personnes
+      <strong>Formule :</strong> Gain total mensuel (heures) = Fréquence × Nb exécutions × Temps unitaire × Nb personnes<br>
+      <small style="font-size: 14px; opacity: 0.9;">Le score est ensuite normalisé sur 40 points selon un barème progressif.</small>
     </div>
 
-    <h3>Q7 - Fréquence du besoin (max 10 pts)</h3>
+    <h3>Étape 1 : Calcul du gain de temps mensuel</h3>
+    
+    <h4>Q7 - Fréquence du besoin (jours par mois)</h4>
+    <p>Nombre de jours par mois où la tâche doit être exécutée (valeur saisie par l'utilisateur)</p>
+    <div class="example">
+      💡 <strong>Exemples courants :</strong>
+      <ul>
+        <li>Quotidien (20 jours ouvrés) → saisir <strong>20</strong></li>
+        <li>Hebdomadaire → saisir <strong>5</strong></li>
+        <li>Mensuel → saisir <strong>1</strong></li>
+        <li>Occasionnel (2 fois/an) → saisir <strong>0.2</strong></li>
+      </ul>
+      L'utilisateur peut saisir n'importe quelle valeur (décimales autorisées)
+    </div>
+
+    <h4>Q8 - Nombre d'exécutions par occurrence</h4>
+    <p>Nombre de fois que la tâche est exécutée à chaque occurrence (valeur saisie par l'utilisateur)</p>
+    <div class="example">
+      💡 <strong>Exemple :</strong> Pour une clôture mensuelle, si 50 fichiers doivent être traités ce jour-là, saisir <strong>50</strong>
+    </div>
+
+    <h4>Q9 - Temps d'exécution unitaire</h4>
+    <p>Durée moyenne d'une seule exécution (saisie en jours/heures/minutes, convertie en heures)</p>
+    <div class="example">
+      💡 <strong>Exemple :</strong> Pour une tâche de 1h30, saisir 1 heure et 30 minutes → <strong>1.5h</strong>
+    </div>
+
+    <h4>Q10 - Nombre de personnes concernées</h4>
+    <p>Nombre de personnes exécutant actuellement cette tâche (valeur saisie par l'utilisateur)</p>
+    <div class="example">
+      💡 <strong>Exemple :</strong> Si 3 comptables font la même tâche de saisie, saisir <strong>3</strong> → le gain total sera multiplié par 3
+    </div>
+
+    <h3>Étape 2 : Normalisation du score (/40 points)</h3>
+    <p>Le temps mensuel est converti en points selon le barème suivant :</p>
     <table>
       <thead>
         <tr>
-          <th>Réponse utilisateur</th>
+          <th>Temps mensuel</th>
           <th>Points</th>
+          <th>Logique</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>Plusieurs fois par jour</td><td><strong>10</strong></td></tr>
-        <tr><td>Quotidien</td><td><strong>10</strong></td></tr>
-        <tr><td>Hebdomadaire</td><td><strong>7</strong></td></tr>
-        <tr><td>Mensuel</td><td><strong>4</strong></td></tr>
-        <tr><td>Occasionnel</td><td><strong>2</strong></td></tr>
+        <tr><td>0-200h</td><td>0-10 pts</td><td>Temps ÷ 20</td></tr>
+        <tr><td>200-1000h</td><td>10-20 pts</td><td>10 + (Temps - 200) ÷ 80</td></tr>
+        <tr><td>1000-4000h</td><td>20-30 pts</td><td>20 + (Temps - 1000) ÷ 300</td></tr>
+        <tr><td>4000h+</td><td>30-40 pts</td><td>30 + min(10, (Temps - 4000) ÷ 1000)</td></tr>
       </tbody>
     </table>
 
-    <h3>Q8 - Nb d'exécutions par occurrence (max 10 pts)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Réponse utilisateur</th>
-          <th>Points</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>200+</td><td><strong>10</strong></td></tr>
-        <tr><td>51-200</td><td><strong>7</strong></td></tr>
-        <tr><td>11-50</td><td><strong>5</strong></td></tr>
-        <tr><td>2-10</td><td><strong>3</strong></td></tr>
-        <tr><td>1</td><td><strong>1</strong></td></tr>
-      </tbody>
-    </table>
-
-    <h3>Q9 - Temps d'exécution unitaire (max 10 pts)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Réponse utilisateur</th>
-          <th>Points</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>&gt; 2h</td><td><strong>10</strong></td></tr>
-        <tr><td>1-2h</td><td><strong>7</strong></td></tr>
-        <tr><td>30 min - 1h</td><td><strong>5</strong></td></tr>
-        <tr><td>10-30 min</td><td><strong>3</strong></td></tr>
-        <tr><td>&lt; 10 min</td><td><strong>1</strong></td></tr>
-      </tbody>
-    </table>
-
-    <h3>Q10 - Nb de personnes exécutantes (max 10 pts)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Réponse utilisateur</th>
-          <th>Points</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>50+</td><td><strong>10</strong></td></tr>
-        <tr><td>21-50</td><td><strong>7</strong></td></tr>
-        <tr><td>6-20</td><td><strong>5</strong></td></tr>
-        <tr><td>2-5</td><td><strong>3</strong></td></tr>
-        <tr><td>1</td><td><strong>1</strong></td></tr>
-      </tbody>
-    </table>
+    <div class="example">
+      <strong>💡 Exemple concret :</strong><br>
+      Q7 = Quotidien (20), Q8 = 50 exécutions, Q9 = 30min (0.5h), Q10 = 3 personnes<br>
+      → Temps par personne = 20 × 50 × 0.5 = 500h/mois<br>
+      → Gain total mensuel = 500h × 3 = <strong>1500h/mois</strong><br>
+      → Score = 20 + (1500 - 1000) ÷ 300 = 20 + 1.67 = <strong>21.67/40</strong> ≈ <strong>22/40</strong> → <strong>55/100</strong>
+    </div>
 
     <div class="highlight">
-      <strong>Total Impact Business = Somme des 4 critères (max 40 pts)</strong>
+      <strong>Ce barème progressif</strong> évite les effets de seuil et valorise proportionnellement les gains importants tout en reconnaissant les petites optimisations.
     </div>
 
     <!-- ============= FAISABILITÉ ============= -->
@@ -315,33 +307,38 @@
       </tbody>
     </table>
 
-    <h3>Types de sources - count (IA) (max 10 pts)</h3>
+    <h3>Nombre total de sources (IA) (max 5 pts)</h3>
     <div class="ai-variable">
-      <strong>⚠️ Variable calculée par l'IA</strong> : Nombre de types de sources différents identifiés par l'IA dans la réponse Q14 (Éléments sources).
+      <strong>⚠️ Variable calculée par l'IA</strong> : Nombre total de sources identifiées par l'IA dans la réponse Q14 (Éléments sources). Plus il y a de sources, plus l'intégration est complexe.
     </div>
     <table>
       <thead>
         <tr>
-          <th>Nb de types différents (IA)</th>
+          <th>Nb total de sources (IA)</th>
           <th>Points</th>
           <th>Explication</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>1-2 types</td>
-          <td><strong>10</strong></td>
-          <td>Simple (ex: Excel + PDF)</td>
+          <td>1-2 sources</td>
+          <td><strong>5</strong></td>
+          <td>Très peu de sources (ex: Excel GL)</td>
         </tr>
         <tr>
-          <td>3-4 types</td>
-          <td><strong>6</strong></td>
-          <td>Moyen (ex: Excel + PDF + SAP + Email)</td>
+          <td>3-5 sources</td>
+          <td><strong>3</strong></td>
+          <td>Quelques sources (ex: Excel GL + Excel OSB + SAP)</td>
         </tr>
         <tr>
-          <td>5+ types</td>
-          <td><strong>2</strong></td>
-          <td>Complexe (beaucoup de systèmes différents)</td>
+          <td>6-10 sources</td>
+          <td><strong>1</strong></td>
+          <td>Nombreuses sources (ex: 8 fichiers Excel + SAP + Email)</td>
+        </tr>
+        <tr>
+          <td>10+ sources</td>
+          <td><strong>0</strong></td>
+          <td>Très nombreuses sources (ex: 15 fichiers différents)</td>
         </tr>
       </tbody>
     </table>
@@ -413,11 +410,12 @@
       <p><strong>Contexte :</strong> Comptable traitant des factures PDF reçues par email</p>
       <ul>
         <li>Q7 : Quotidien</li>
-        <li>Q8 : 51-200 factures par jour</li>
-        <li>Q9 : 10-30 min par facture</li>
+        <li>Q8 : 100 factures par jour (saisie libre)</li>
+        <li>Q9 : 15 minutes par facture (saisie libre)</li>
         <li>Q10 : 2-5 personnes</li>
         <li>Q17 : Règles claires (Oui)</li>
         <li><strong>count (IA) : 3 types</strong> (PDF, Excel, SAP)</li>
+        <li><strong>catégorie (IA) : Complexe</strong> (PDF avec OCR)</li>
         <li>Q19 : Complexité moyenne</li>
         <li>Q15 : Action manuelle (Oui)</li>
         <li>Q11 : Irritant niveau 4</li>
@@ -429,12 +427,12 @@
       
       <div style="margin-bottom: 16px;">
         <strong>IMPACT BUSINESS (/40)</strong>
-        <div class="calculation-line">Fréquence (Quotidien) = 10</div>
-        <div class="calculation-line">NbExec (51-200) = 7</div>
-        <div class="calculation-line">Temps (10-30min) = 3</div>
-        <div class="calculation-line">Personnes (2-5) = 3</div>
+        <div class="calculation-line">Temps mensuel = Fréquence × NbExec × Temps</div>
+        <div class="calculation-line">= Quotidien (20) × 100 × 0.25h (15min)</div>
+        <div class="calculation-line">= <strong>500h/mois</strong></div>
+        <div class="calculation-line">Score = 10 + (500-200)/80 = 10 + 3.75 ≈ <strong>14/40</strong></div>
         <div class="calculation-line" style="border-top: 1px dashed #dee2e6; margin-top: 6px; padding-top: 6px;">
-          <strong>Sous-total Impact = 10 + 7 + 3 + 3 = 23/40</strong>
+          <strong>Sous-total Impact = 14/40 → 35/100</strong>
         </div>
       </div>
 
@@ -442,22 +440,25 @@
         <strong>FAISABILITÉ TECHNIQUE (/30)</strong>
         <div class="calculation-line">Règles (Oui) = 10</div>
         <div class="calculation-line" style="background: #d1e7dd; padding: 4px 0;">
-          <strong>TypesSources (3 types) = 6</strong> ← Résultat IA
+          <strong>TypesSources (3 types) = 3</strong> ← Résultat IA
+        </div>
+        <div class="calculation-line" style="background: #d1e7dd; padding: 4px 0;">
+          <strong>CatégorieSources (Complexe) = 1</strong> ← Résultat IA
         </div>
         <div class="calculation-line">ComplexitéOrga (Moyenne) = 4</div>
         <div class="calculation-line">ActionManuelle (Oui) = 0</div>
         <div class="calculation-line" style="border-top: 1px dashed #dee2e6; margin-top: 6px; padding-top: 6px;">
-          <strong>Sous-total Faisabilité = 10 + 6 + 4 + 0 = 20/30</strong>
+          <strong>Sous-total Faisabilité = 10 + 3 + 1 + 4 + 0 = 18/30</strong> → 60/100
         </div>
       </div>
 
       <div style="margin-bottom: 16px;">
         <strong>URGENCE (/30)</strong>
-        <div class="calculation-line">Irritant (4 × 6) = 24/30</div>
+        <div class="calculation-line">Irritant (4 × 6) = 24/30</div> → 80/100
       </div>
 
       <div class="calculation-total">
-        SCORE TOTAL = 23 + 20 + 24 = 67/100 → 🟡 À challenger
+        SCORE TOTAL = 14 + 18 + 24 = 56/100 → 🟡 À challenger
       </div>
     </div>
 
@@ -502,13 +503,13 @@
       <tbody>
         <tr>
           <td><strong>Impact Business</strong></td>
-          <td>10 + 10 + 10 + 10</td>
+          <td>Temps mensuel (calculé) → normalisé /40</td>
           <td><strong>40 pts</strong></td>
           <td style="color: var(--success); font-weight: 700;">✓</td>
         </tr>
         <tr>
           <td><strong>Faisabilité Technique</strong></td>
-          <td>10 + 10 + 7 + 3</td>
+          <td>10 + 5 + 5 + 7 + 3</td>
           <td><strong>30 pts</strong></td>
           <td style="color: var(--success); font-weight: 700;">✓</td>
         </tr>
@@ -531,21 +532,24 @@
     <h2 id="categories-sources">🤖 Variables calculées par l'IA</h2>
     
     <div class="ai-variable">
-      <h3 style="margin-top: 0;">1. Nombre de types de sources (count)</h3>
+      <h3 style="margin-top: 0;">1. Nombre total de sources (total_sources)</h3>
       <p><strong>Source :</strong> Analyse automatique de la réponse Q14 (Éléments sources de la tâche)</p>
-      <p><strong>Logique :</strong> L'IA identifie et catégorise chaque type de source mentionné (Excel, PDF, Email, SAP...)</p>
+      <p><strong>Logique :</strong> L'IA compte le nombre total de sources mentionnées. Plus il y a de sources à intégrer, plus c'est complexe.</p>
       <p><strong>Barème (max 5 points) :</strong></p>
       <ul>
-        <li>1-2 types → <strong>5 points</strong> (peu d'intégrations)</li>
-        <li>3-4 types → <strong>3 points</strong> (intégrations multiples)</li>
-        <li>5+ types → <strong>1 point</strong> (très nombreuses intégrations)</li>
+        <li>1-2 sources → <strong>5 points</strong> (très peu de sources)</li>
+        <li>3-5 sources → <strong>3 points</strong> (quelques sources)</li>
+        <li>6-10 sources → <strong>1 point</strong> (nombreuses sources)</li>
+        <li>10+ sources → <strong>0 point</strong> (très nombreuses sources)</li>
       </ul>
-      <p><strong>Exemple :</strong></p>
+      <p><strong>Exemples :</strong></p>
       <ul>
-        <li>"Excel GL + Excel OSB + SAP" → <strong>2 types</strong> (Excel, ERP_CRM) → 5 points</li>
-        <li>"PDF + Excel + SAP + Email" → <strong>4 types</strong> → 3 points</li>
-        <li>"Excel + PDF + SAP + Email + Images + Papier" → <strong>6 types</strong> → 1 point</li>
+        <li>"Excel GL" → <strong>1 source</strong> → 5 points</li>
+        <li>"Excel GL + Excel OSB + SAP" → <strong>3 sources</strong> → 3 points</li>
+        <li>"5 fichiers Excel + 2 PDF + SAP + Email" → <strong>9 sources</strong> → 1 point</li>
+        <li>"12 fichiers Excel différents + SAP + 3 PDF + 2 Emails" → <strong>18 sources</strong> → 0 point</li>
       </ul>
+      <p><strong>💡 Note :</strong> L'IA identifie également le nombre de <em>types</em> de sources (ex: Excel GL + Excel OSB = 1 type, Excel GL + SAP = 2 types) pour information, mais c'est le nombre <em>total</em> de sources qui impacte le scoring de faisabilité.</p>
     </div>
 
     <div class="ai-variable" style="margin-top: 30px;">
@@ -602,8 +606,11 @@
     <div class="formula-box">
       <h3 style="margin-top: 0; color: var(--primary);">Formule de base</h3>
       <div style="text-align: center; font-size: 18px; font-weight: 700; padding: 15px; background: white; border-radius: 8px; margin: 15px 0;">
-        <strong>Gain mensuel (heures) = Fréquence × Nb exécutions × Temps unitaire</strong>
+        <strong>Gain total mensuel (heures) = Fréquence × Nb exécutions × Temps unitaire × Nb personnes</strong>
       </div>
+      <p style="text-align: center; font-size: 14px; color: #6c757d; margin-top: 10px;">
+        Le gain total prend en compte le fait que plusieurs personnes peuvent faire la même tâche
+      </p>
     </div>
 
     <h3>📐 Détail des variables</h3>
@@ -617,75 +624,72 @@
       </thead>
       <tbody>
         <tr class="section-header">
-          <td colspan="3"><strong>Q7 - Fréquence du besoin</strong> (occurrences par mois sur 20 jours ouvrés)</td>
+          <td colspan="3"><strong>Q7 - Fréquence du besoin</strong> (valeur brute saisie en jours/mois)</td>
         </tr>
-        <tr><td>Quotidien</td><td>20 jours</td><td><strong>20</strong></td></tr>
-        <tr><td>Hebdomadaire</td><td>~5 fois/mois</td><td><strong>5</strong></td></tr>
-        <tr><td>Mensuel</td><td>1 fois/mois</td><td><strong>1</strong></td></tr>
-        <tr><td>Occasionnel</td><td>~2 fois/an</td><td><strong>0.5</strong></td></tr>
+        <tr><td colspan="3">L'utilisateur saisit directement le nombre de jours par mois où la tâche doit être exécutée (ex: 20 pour quotidien, 5 pour hebdomadaire, 1 pour mensuel, 0.5 pour occasionnel). Décimales autorisées.</td></tr>
         
         <tr class="section-header">
-          <td colspan="3"><strong>Q8 - Nombre d'exécutions par occurrence</strong> (valeur médiane de la fourchette)</td>
+          <td colspan="3"><strong>Q8 - Nombre d'exécutions par occurrence</strong> (valeur brute saisie)</td>
         </tr>
-        <tr><td>1</td><td>1 exécution</td><td><strong>1</strong></td></tr>
-        <tr><td>2-10</td><td>Médiane</td><td><strong>6</strong></td></tr>
-        <tr><td>11-50</td><td>Médiane</td><td><strong>30</strong></td></tr>
-        <tr><td>51-200</td><td>Médiane</td><td><strong>125</strong></td></tr>
-        <tr><td>200+</td><td>Estimation</td><td><strong>200</strong></td></tr>
+        <tr><td colspan="3">L'utilisateur saisit directement un nombre (ex: 50, 100, 250). Cette valeur est utilisée telle quelle dans le calcul.</td></tr>
         
         <tr class="section-header">
-          <td colspan="3"><strong>Q9 - Temps d'exécution unitaire</strong> (en heures, valeur médiane)</td>
+          <td colspan="3"><strong>Q9 - Temps d'exécution unitaire</strong> (converti en heures)</td>
         </tr>
-        <tr><td>&lt; 10 min</td><td>~5 min</td><td><strong>0.1h</strong></td></tr>
-        <tr><td>10-30 min</td><td>~20 min</td><td><strong>0.33h</strong></td></tr>
-        <tr><td>30 min - 1h</td><td>~45 min</td><td><strong>0.75h</strong></td></tr>
-        <tr><td>1-2h</td><td>~1h30</td><td><strong>1.5h</strong></td></tr>
-        <tr><td>&gt; 2h</td><td>~3h</td><td><strong>3h</strong></td></tr>
+        <tr><td colspan="3">L'utilisateur saisit Jours/Heures/Minutes séparément. Le système convertit : <strong>Heures = (Jours × 7) + Heures + (Minutes / 60)</strong></td></tr>
+        
+        <tr class="section-header">
+          <td colspan="3"><strong>Q10 - Nombre de personnes concernées</strong> (valeur brute saisie)</td>
+        </tr>
+        <tr><td colspan="3">L'utilisateur saisit directement le nombre de personnes qui font actuellement cette tâche (ex: 1, 3, 10). C'est un multiplicateur du gain.</td></tr>
       </tbody>
     </table>
 
     <h3>💡 Exemples de calcul</h3>
     
     <div class="example-box" style="background: #e7f5ff; border-left: 4px solid var(--primary); padding: 15px; margin: 20px 0; border-radius: 5px;">
-      <h4 style="margin-top: 0; color: var(--primary);">Exemple 1 : Saisie quotidienne</h4>
-      <p><strong>Contexte :</strong> Saisie de factures dans SAP, 50 factures/jour, 20 min chacune</p>
+      <h4 style="margin-top: 0; color: var(--primary);">Exemple 1 : Saisie quotidienne (1 personne)</h4>
+      <p><strong>Contexte :</strong> Saisie de factures dans SAP, 50 factures/jour, 20 min chacune, 1 personne</p>
       <ul>
-        <li>Q7 : Quotidien → <strong>20</strong></li>
-        <li>Q8 : 11-50 → <strong>30</strong></li>
-        <li>Q9 : 10-30 min → <strong>0.33h</strong></li>
+        <li>Q7 : Saisie <strong>20</strong> (quotidien = 20 jours ouvrés)</li>
+        <li>Q8 : Saisie <strong>50</strong> (valeur exacte)</li>
+        <li>Q9 : Saisie 0j / 0h / 20min → <strong>0.33h</strong></li>
+        <li>Q10 : Saisie <strong>1</strong> personne</li>
       </ul>
-      <p><strong>Calcul :</strong> 20 × 30 × 0.33 = <strong>198h/mois</strong></p>
-      <p><strong>ETP :</strong> 198h / 140h = <strong>1.4 ETP</strong> (base 7h/jour × 20 jours)</p>
+      <p><strong>Calcul :</strong> 20 × 50 × 0.33 × 1 = <strong>330h/mois</strong></p>
+      <p><strong>ETP :</strong> 330h / 140h = <strong>2.4 ETP</strong> (base 7h/jour × 20 jours)</p>
     </div>
 
     <div class="example-box" style="background: #fff3cd; border-left: 4px solid var(--warning); padding: 15px; margin: 20px 0; border-radius: 5px;">
-      <h4 style="margin-top: 0; color: #856404;">Exemple 2 : Rapprochement mensuel</h4>
-      <p><strong>Contexte :</strong> Clôture comptable mensuelle, 200 écritures, 30 min chacune</p>
+      <h4 style="margin-top: 0; color: #856404;">Exemple 2 : Rapprochement mensuel (3 personnes)</h4>
+      <p><strong>Contexte :</strong> Clôture comptable mensuelle, 200 écritures, 30 min chacune, faite par 3 comptables</p>
       <ul>
-        <li>Q7 : Mensuel → <strong>1</strong></li>
-        <li>Q8 : 51-200 → <strong>125</strong></li>
-        <li>Q9 : 10-30 min → <strong>0.33h</strong></li>
+        <li>Q7 : Saisie <strong>1</strong> (mensuel = 1 fois/mois)</li>
+        <li>Q8 : Saisie <strong>200</strong> (valeur exacte)</li>
+        <li>Q9 : Saisie 0j / 0h / 30min → <strong>0.5h</strong></li>
+        <li>Q10 : Saisie <strong>3</strong> personnes</li>
       </ul>
-      <p><strong>Calcul :</strong> 1 × 125 × 0.33 = <strong>41h/mois</strong></p>
-      <p><strong>ETP :</strong> 41h / 140h = <strong>0.3 ETP</strong></p>
+      <p><strong>Calcul :</strong> 1 × 200 × 0.5 × 3 = <strong>300h/mois</strong></p>
+      <p><strong>ETP :</strong> 300h / 140h = <strong>2.1 ETP</strong></p>
     </div>
 
     <div class="example-box" style="background: #f8d7da; border-left: 4px solid var(--danger); padding: 15px; margin: 20px 0; border-radius: 5px;">
-      <h4 style="margin-top: 0; color: #721c24;">Exemple 3 : Reporting hebdomadaire intensif</h4>
-      <p><strong>Contexte :</strong> Extraction et consolidation de données, ~30 sources, 3h chaque</p>
+      <h4 style="margin-top: 0; color: #721c24;">Exemple 3 : Reporting hebdomadaire intensif (2 personnes)</h4>
+      <p><strong>Contexte :</strong> Extraction et consolidation de données, ~30 sources, 3h chaque, 2 analystes</p>
       <ul>
-        <li>Q7 : Hebdomadaire → <strong>5</strong></li>
-        <li>Q8 : 11-50 → <strong>30</strong></li>
-        <li>Q9 : &gt; 2h → <strong>3h</strong></li>
+        <li>Q7 : Saisie <strong>5</strong> (hebdomadaire ≈ 5 fois/mois)</li>
+        <li>Q8 : Saisie <strong>30</strong> (valeur exacte)</li>
+        <li>Q9 : Saisie 0j / 3h / 0min → <strong>3h</strong></li>
+        <li>Q10 : Saisie <strong>2</strong> personnes</li>
       </ul>
-      <p><strong>Calcul :</strong> 5 × 30 × 3 = <strong>450h/mois</strong></p>
-      <p><strong>ETP :</strong> 450h / 140h = <strong>3.2 ETP</strong></p>
+      <p><strong>Calcul :</strong> 5 × 30 × 3 × 2 = <strong>900h/mois</strong></p>
+      <p><strong>ETP :</strong> 900h / 140h = <strong>6.4 ETP</strong></p>
     </div>
 
     <h3>❓ Questions fréquentes</h3>
     <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-      <p><strong>Q : Que faire si plusieurs personnes font la même tâche (Q10 : 50+ personnes) ?</strong></p>
-      <p>R : Le gain de temps calculé représente le temps total économisé pour l'organisation par mois. Si 50 personnes font la tâche, elles se partagent le travail. Le gain reste le même : c'est le temps global libéré.</p>
+      <p><strong>Q : Si 3 personnes font la même tâche indépendamment, comment est calculé le gain ?</strong></p>
+      <p>R : Le gain est multiplié par le nombre de personnes. Si une personne économise 100h/mois en automatisant sa tâche et que 3 personnes font la même tâche, le gain total sera de 300h/mois pour l'organisation. Chaque personne bénéficie individuellement de l'automatisation.</p>
       
       <p style="margin-top: 15px;"><strong>Q : Comment interpréter un gain de 8000h/mois ?</strong></p>
       <p>R : C'est le temps total cumulé que l'organisation passe sur cette tâche chaque mois. Divisez par 140h (mois plein) pour obtenir l'équivalent ETP : 8000h / 140h = 57 ETP. Cela signifie que cette tâche mobilise l'équivalent de 57 personnes à temps plein.</p>

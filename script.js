@@ -729,8 +729,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const faisabilite = parseRatio(scoring.faisabilite_technique_score); // X: 0-100
     const urgence = parseRatio(scoring.urgence_score);
     // ETP: calculer depuis gain_temps_mensuel_heures
-    const etp = scoring.gain_temps_mensuel_heures / 140; // Y: 0-10 (capé)
-    const etpCapped = Math.min(etp, 10); // Capper à 10 pour l'affichage
+    const etp = scoring.gain_temps_mensuel_heures / 140; // Y: 0-5 (capé)
+    const etpCapped = Math.min(etp, 5); // Capper à 5 pour l'affichage
     
     // Fond
     ctx.fillStyle = '#f8f9fa';
@@ -738,9 +738,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Zones colorées selon faisabilité et ETP
     // Faisabilité 50 = x = width/2
-    // ETP 1 = y = height - (height/10) car échelle 0-10 et Y inversé
+    // ETP 1 = y = height - (height/5) car échelle 0-5 et Y inversé
     const fais50X = (50 / 100) * width; // Position X de faisabilité = 50
-    const etp1Y = height - ((1 / 10) * height); // Position Y de ETP = 1
+    const etp1Y = height - ((1 / 5) * height); // Position Y de ETP = 1
     
     // Zone rouge : Faisabilité < 50 ET ETP < 1 (bas-gauche)
     ctx.fillStyle = 'rgba(220, 53, 69, 0.15)'; // Rouge
@@ -801,13 +801,13 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.font = '9px sans-serif';
     ctx.fillStyle = '#6c757d';
     for (let i = 0; i <= 5; i++) {
-      const y = height - ((i * 2) / 10) * height; // Tous les 2 ETP
-      ctx.fillText((i * 2).toString(), 5, y + 3);
+      const y = height - (i / 5) * height; // Tous les 1 ETP
+      ctx.fillText(i.toString(), 5, y + 3);
     }
     
     // Calculer position du point (inverser Y car canvas a Y=0 en haut)
     const faisabiliteNorm = faisabilite.numerator / 100; // 0-1
-    const etpNorm = etpCapped / 10; // 0-1 (sur échelle 0-10)
+    const etpNorm = etpCapped / 5; // 0-1 (sur échelle 0-5)
     const urgenceNorm = urgence.numerator / 100; // 0-1
     const x = faisabiliteNorm * width;
     const y = height - (etpNorm * height); // Inverser Y
@@ -832,7 +832,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.font = 'bold 9px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    const etpText = etp < 10 ? etp.toFixed(1) : '10+';
+    const etpText = etp < 5 ? etp.toFixed(1) : '5+';
     ctx.fillText(etpText, x, y);
     
     // Légende pour l'urgence (en bas à l'intérieur du graphique)

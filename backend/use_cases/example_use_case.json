@@ -1,0 +1,155 @@
+{
+  "metadata": {
+    "saved_at": "2025-10-18T18:41:10.728809",
+    "project_name": "Automatisation Rapprochement GL",
+    "persona": "Durand Marie",
+    "role": "Contrôleur de gestion",
+    "department": "Comptabilité / Finance",
+    "score": 57,
+    "priority": "Quick win"
+  },
+  "form_data": {
+    "persona": {
+      "nom": "Durand",
+      "prenom": "Marie",
+      "role": "Contrôleur de gestion",
+      "departement": "Comptabilité / Finance"
+    },
+    "contexte_besoin": {
+      "brief_utilisateur": "Actuellement, à chaque clôture mensuelle, je dois rapprocher les écritures comptables GL avec les données déclaratives OSB pour identifier les écarts entre ce qui est déclaré et ce qui est comptabilisé.\nJe charge manuellement les fichiers GL et OSB, filtre les lignes concernées, puis fais des appariements par montant et mois dans Excel ou via un script semi-automatisé. Ensuite, je dois isoler les écarts (notamment O2T) et les communiquer aux métiers pour correction.\nCe travail est long, répétitif, sensible aux erreurs humaines et prend plusieurs heures chaque mois.\nLe résultat souhaité : automatiser le matching des données, la détection des écarts et produire un rapport standardisé, pour ne me concentrer que sur l’analyse à valeur ajoutée.",
+      "execution_actuelle": "Téléchargement manuel des exports GL et OSB.\nFiltrage par CR et période dans Excel.\nNettoyage des données (sources spécifiques, exclusions).\nMatching manuel ou semi-auto par montant/date.\nIdentification des écarts non appariés et des cas O2T.\nAnalyse et échanges avec les métiers pour régularisation.\nProduction du rapport final et archivage."
+    },
+    "volumetrie": {
+      "frequence_besoin": "20",
+      "nb_executions_par_occurrence": "20",
+      "temps_execution_unitaire": "20min",
+      "nb_personnes_executantes": "3",
+      "niveau_irritant": "4",
+      "pourquoi_irritant": "Tâche très répétitive et peu valorisante, forte pression de délai en clôture, erreurs fréquentes et retraitements.",
+      "pourquoi_urgent": "Un retard ou une erreur impacte directement la fiabilité du reporting financier et peut bloquer la clôture mensuelle."
+    },
+    "nature_tache": {
+      "elements_sources": "– Fichiers Excel exportés de l’ERP comptable (GL)\n– Fichiers Excel exportés d’OSB (outil déclaratif)\n– Données issues de systèmes internes (ERP / OSB)",
+      "action_manuelle": "Oui",
+      "exemple_action_manuelle": "Copier-coller de données dans Excel, filtrage manuel, matching des lignes non reconnues automatiquement, catégorisation des écarts, envoi d’e-mails aux métiers.",
+      "regles_simples_stables": "Partiellement",
+      "points_complexes_detailles": "Décalages temporels entre GL et OSB (mois différents)\nProvisions O2T non débouclées correctement\nCas exceptionnels nécessitant échanges avec métiers (libellés ambigus, fournisseurs atypiques)\nValidation et régularisation hors outil automatisé",
+      "complexite_organisationnelle": "Simple",
+      "outils_necessaires": "Excel et OSB"
+    }
+  },
+  "ai_analysis": {
+    "user_story": {
+      "project_name": "Automatisation Rapprochement GL",
+      "html": "<p><strong>En tant que</strong> contrôleur de gestion dans le département Comptabilité/Finance avec une volumétrie élevée,</p> <p><strong>j'ai besoin de</strong> automatiser le matching des données GL et OSB, la détection des écarts et la production d'un rapport standardisé,</p> <p><strong>afin de</strong> réduire le temps de traitement, minimiser les erreurs et me concentrer sur l'analyse à valeur ajoutée.</p>",
+      "word_count": 51
+    },
+    "execution_schema": {
+      "ascii_diagram": "|Téléchargement manuel|\n|       |\n|Filtrage Excel|\n|       |\n|Matching manuel|\n|       |\n|Identification écarts|\n|       |\n|Analyse et échanges|\n|       |\n|Production rapport|"
+    },
+    "elements_sources": {
+      "types": [
+        {
+          "category": "Excel",
+          "description": "Fichiers Excel exportés de l’ERP comptable (GL) et d’OSB"
+        },
+        {
+          "category": "ERP_CRM",
+          "description": "Données issues de systèmes internes (ERP / OSB)"
+        }
+      ],
+      "count": 2,
+      "total_sources": 3,
+      "complexity_level": "Standard"
+    },
+    "analysis": {
+      "pain_points": [
+        "Répétitivité",
+        "Erreurs fréquentes",
+        "Lenteur"
+      ],
+      "benefits": [
+        "Gain de temps",
+        "Amélioration qualité",
+        "Satisfaction utilisateurs"
+      ],
+      "feasibility_score": 7,
+      "priority": "Quick win"
+    },
+    "pro_con": {
+      "pros": [
+        {
+          "argument": "Réduction significative du temps de traitement mensuel.",
+          "weight": "Fort"
+        },
+        {
+          "argument": "Diminution des erreurs humaines dans le rapprochement.",
+          "weight": "Fort"
+        },
+        {
+          "argument": "Amélioration de la fiabilité du reporting financier.",
+          "weight": "Moyen"
+        }
+      ],
+      "cons": [
+        {
+          "argument": "Complexité des cas exceptionnels nécessitant une intervention humaine.",
+          "weight": "Moyen"
+        },
+        {
+          "argument": "Nécessité d'une phase de validation post-automatisation.",
+          "weight": "Faible"
+        }
+      ]
+    },
+    "scoring": {
+      "impact_business_score": "30/100",
+      "faisabilite_technique_score": "70/100",
+      "urgence_score": "80/100",
+      "total": 57,
+      "formula": "Impact[TempsMensuel(400.0h) = Fréquence(20.0j/mois) × NbExec(20) × Temps(0.33h) × NbPersonnes(3) = 12/40 = 30/100] + Faisabilité[Règles(Partiellement=6) + NbSources(3=3pts) + CatégorieSources(Standard=5pts) + ComplexitéOrga(Simple=7) + ActionManuelle(Oui=0) = 21/30 = 70/100] + Urgence[Irritant(4×6) = 24/30 = 80/100] = Total 57/100",
+      "justification": "Score de 57/100 basé sur : Impact Business 30/100 (temps mensuel total 400.0h = fréquence 20.0/mois × 20 exécutions × 20min × 3 personnes), Faisabilité Technique 70/100 (3 sources (2 types) catégorie Standard, règles Partiellement, complexité orga Simple), Urgence 80/100 (irritant 4/5).",
+      "gain_temps_mensuel_heures": 399
+    },
+    "delivery": {
+      "dev_time": "3-4 mois",
+      "phases": [
+        {
+          "phase": 1,
+          "name": "POC",
+          "feature_principale": "Automatisation du téléchargement et filtrage des données.",
+          "risque_principal": "Intégration avec les systèmes existants.",
+          "duration": "4 semaines"
+        },
+        {
+          "phase": 2,
+          "name": "MVP",
+          "feature_principale": "Matching automatique des données GL et OSB.",
+          "risque_principal": "Gestion des exceptions et cas complexes.",
+          "duration": "6 semaines"
+        },
+        {
+          "phase": 3,
+          "name": "Production",
+          "feature_principale": "Génération de rapports standardisés et archivage.",
+          "risque_principal": "Scalabilité et performance du système.",
+          "duration": "4 semaines"
+        }
+      ],
+      "quick_wins": [
+        {
+          "action": "Utiliser des macros Excel pour automatiser le filtrage initial.",
+          "impact": "Réduction du temps de préparation des données."
+        },
+        {
+          "action": "Mettre en place un modèle de rapport standardisé manuel.",
+          "impact": "Uniformisation des résultats et gain de temps."
+        },
+        {
+          "action": "Former les utilisateurs à l'utilisation efficace des outils actuels.",
+          "impact": "Réduction des erreurs humaines."
+        }
+      ]
+    }
+  }
+}

@@ -1,11 +1,46 @@
-# Ignorer environnements et secrets
-.venv/
-backend/.venv/
+# Python
 __pycache__/
 **/__pycache__/
-backend/.env
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+backend/.venv/
+
+# Environment variables & secrets
 .env
 *.env
-node_modules/
+!.env.example
+backend/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
-backend/use_cases/
+Thumbs.db
+
+# Node (si nécessaire)
+node_modules/
+
+# Use cases (garder seulement l'exemple)
+backend/use_cases/202*.json
+
+# Logs
+*.log
+logs/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
